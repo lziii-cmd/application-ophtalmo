@@ -16,6 +16,11 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
+CSRF_TRUSTED_ORIGINS = [
+    f"https://{host}" for host in os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
+    if host not in ('localhost', '127.0.0.1')
+] + ['http://localhost:8765', 'http://127.0.0.1:8765']
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
