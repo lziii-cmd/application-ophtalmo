@@ -52,10 +52,11 @@ class Command(BaseCommand):
                 "password": "Medecin@1234",
                 "first_name": "Hassan",
                 "last_name": "Diallo",
-                "email": "dr.hassan@cabinet.local",
+                "email": "h.diallo@ophtalmo-sn.com",
                 "role": "medecin",
                 "rpps": "10012345678",
-                "specialite": "Ophtalmologie",
+                "specialite": "Ophtalmologiste",
+                "telephone": "+221 77 567 89 01",
             },
             {
                 "username": "secretaire",

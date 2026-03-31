@@ -110,42 +110,41 @@ def get_styles():
 
 def build_header(story, medecin, styles):
     """Construit l'en-tête du document avec les informations du médecin."""
-    # En-tête médecin
     medecin_name = medecin.get_full_name() or medecin.username
-    specialite = getattr(medecin, 'specialite', '') or 'Ophtalmologue'
+    specialite = getattr(medecin, 'specialite', '') or 'Ophtalmologiste'
     rpps = getattr(medecin, 'rpps', '') or ''
     telephone = getattr(medecin, 'telephone', '') or ''
+    email = getattr(medecin, 'email', '') or ''
 
-    header_data = [
-        [
-            Paragraph(f"Dr {medecin_name}", styles['ClinicHeader']),
-            Paragraph(
-                f"<b>Cabinet d'Ophtalmologie</b>",
-                ParagraphStyle('Right', parent=styles['Normal'], alignment=TA_RIGHT, fontSize=10)
-            )
-        ],
-        [
-            Paragraph(specialite, styles['ClinicSubHeader']),
-            Paragraph(
-                f"Date: {timezone.now().strftime('%d/%m/%Y')}",
-                ParagraphStyle('Right', parent=styles['Normal'], alignment=TA_RIGHT, fontSize=9,
-                               textColor=colors.HexColor('#6c757d'))
-            )
-        ],
+    style_right = ParagraphStyle('Right', parent=styles['Normal'], alignment=TA_RIGHT, fontSize=10)
+    style_right_sm = ParagraphStyle('RightSm', parent=styles['Normal'], alignment=TA_RIGHT,
+                                    fontSize=9, textColor=colors.HexColor('#6c757d'))
+
+    left_col = [
+        Paragraph(f"Dr {medecin_name}", styles['ClinicHeader']),
+        Paragraph(specialite, styles['ClinicSubHeader']),
+    ]
+    if rpps:
+        left_col.append(Paragraph(f"RPPS : {rpps}", styles['ClinicSubHeader']))
+    if telephone:
+        left_col.append(Paragraph(f"Tel : {telephone}", styles['ClinicSubHeader']))
+
+    right_col = [
+        Paragraph("<b>Cabinet d'Ophtalmologie</b>", style_right),
+        Paragraph("Dakar, Senegal", style_right_sm),
+        Paragraph(f"Tel : {telephone}", style_right_sm) if telephone else Paragraph('', styles['Normal']),
+        Paragraph(f"{email}", style_right_sm) if email else Paragraph('', styles['Normal']),
     ]
 
-    if rpps:
-        header_data.append([
-            Paragraph(f"RPPS: {rpps}", styles['ClinicSubHeader']),
-            Paragraph('', styles['Normal'])
-        ])
-    if telephone:
-        header_data.append([
-            Paragraph(f"Tél: {telephone}", styles['ClinicSubHeader']),
-            Paragraph('', styles['Normal'])
-        ])
+    # Construire en tableau 2 colonnes
+    rows = []
+    max_rows = max(len(left_col), len(right_col))
+    for i in range(max_rows):
+        l = left_col[i] if i < len(left_col) else Paragraph('', styles['Normal'])
+        r = right_col[i] if i < len(right_col) else Paragraph('', styles['Normal'])
+        rows.append([l, r])
 
-    header_table = Table(header_data, colWidths=[10*cm, 9*cm])
+    header_table = Table(rows, colWidths=[10*cm, 9*cm])
     header_table.setStyle(TableStyle([
         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
         ('TOPPADDING', (0, 0), (-1, -1), 2),
@@ -282,11 +281,21 @@ def generate_prescription_pdf(prescription):
     # Pied de page
     story.append(Spacer(1, 1*cm))
     story.append(HRFlowable(width='100%', thickness=0.5, color=colors.HexColor('#dee2e6')))
-    story.append(Paragraph(
-        f"Prescription émise le {prescription.date_creation.strftime('%d/%m/%Y à %H:%M')} - "
-        f"Réf: PRESC-{prescription.pk:06d}",
-        styles['SmallText']
-    ))
+
+    medecin_tel = getattr(medecin, 'telephone', '') or ''
+    medecin_email = getattr(medecin, 'email', '') or ''
+    medecin_rpps = getattr(medecin, 'rpps', '') or ''
+
+    footer_lines = []
+    if medecin_tel or medecin_email:
+        contact = '  •  '.join(filter(None, [medecin_tel, medecin_email]))
+        footer_lines.append(contact)
+    footer_lines.append(f"Ref : PRESC-{prescription.pk:06d}  —  emis le {prescription.date_creation.strftime('%d/%m/%Y')}")
+    if medecin_rpps:
+        footer_lines.append(f"RPPS : {medecin_rpps}")
+
+    for line in footer_lines:
+        story.append(Paragraph(line, styles['SmallText']))
 
     doc.build(story, onFirstPage=on_first_page)
     buffer.seek(0)
@@ -305,13 +314,13 @@ def generate_prescription_pdf(prescription):
 
 def _build_lunettes_content(story, contenu, styles):
     """Contenu pour ordonnance lunettes."""
-    story.append(Paragraph("Correction optique prescrite:", styles['SectionTitle']))
+    story.append(Paragraph("Correction optique prescrite :", styles['SectionTitle']))
 
     od = contenu.get('oeil_droit', {})
     og = contenu.get('oeil_gauche', {})
 
     data = [
-        ['', 'Sphère', 'Cylindre', 'Axe', 'Addition'],
+        ['Oeil', 'Sphere', 'Cylindre', 'Axe', 'Addition'],
         [
             'Oeil droit (OD)',
             od.get('sphere', '-') or '-',
@@ -399,13 +408,13 @@ def _build_examen_content(story, contenu, styles):
 
 def _build_lentilles_content(story, contenu, styles):
     """Contenu pour ordonnance lentilles."""
-    story.append(Paragraph("Prescription de lentilles de contact:", styles['SectionTitle']))
+    story.append(Paragraph("Prescription de lentilles de contact :", styles['SectionTitle']))
 
     od = contenu.get('oeil_droit', {})
     og = contenu.get('oeil_gauche', {})
 
     data = [
-        ['', 'Rayon', 'Diamètre', 'Puissance', 'Marque'],
+        ['Oeil', 'Rayon', 'Diametre', 'Puissance', 'Marque'],
         [
             'Oeil droit (OD)',
             od.get('rayon', '-') or '-',
