@@ -200,6 +200,73 @@ def rdv_cancel_view(request, pk):
 
 
 @login_required
+def calendar_events_api(request):
+    """API FullCalendar - retourne les RDV au format JSON."""
+    rdvs = RendezVous.objects.select_related('patient', 'medecin').all()
+    start = request.GET.get('start')
+    end = request.GET.get('end')
+    if start:
+        rdvs = rdvs.filter(date_heure__gte=start)
+    if end:
+        rdvs = rdvs.filter(date_heure__lte=end)
+
+    color_map = {
+        'programme': '#0d6efd',
+        'effectue': '#198754',
+        'annule': '#dc3545',
+        'non_presente': '#ffc107',
+    }
+    events = []
+    for rdv in rdvs:
+        events.append({
+            'id': rdv.pk,
+            'title': str(rdv.patient.nom_complet),
+            'start': rdv.date_heure.isoformat(),
+            'end': rdv.heure_fin.isoformat(),
+            'url': f'/agenda/{rdv.pk}/',
+            'backgroundColor': color_map.get(rdv.statut, '#6c757d'),
+            'borderColor': color_map.get(rdv.statut, '#6c757d'),
+            'extendedProps': {
+                'statut': rdv.statut,
+                'motif': rdv.motif,
+                'medecin': rdv.medecin.get_full_name(),
+            }
+        })
+    return JsonResponse(events, safe=False)
+
+
+@login_required
+def rdv_move_api(request, pk):
+    """API drag & drop - déplacer un RDV via FullCalendar."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    if not (request.user.is_secretaire or request.user.is_administrateur or request.user.is_superuser):
+        return JsonResponse({'error': 'Permission refusée'}, status=403)
+    try:
+        rdv = RendezVous.objects.get(pk=pk)
+        data = json.loads(request.body)
+        new_start = data.get('start')
+        from django.utils.dateparse import parse_datetime
+        from django.utils import timezone as tz
+        dt = parse_datetime(new_start)
+        if dt and not tz.is_aware(dt):
+            dt = tz.make_aware(dt)
+        rdv.date_heure = dt
+        rdv.save(update_fields=['date_heure'])
+        log_action(
+            user=request.user,
+            action='UPDATE',
+            entity='RendezVous',
+            entity_id=str(rdv.pk),
+            after={'date_heure': str(rdv.date_heure)},
+            request=request
+        )
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+@login_required
 @role_required('medecin', 'secretaire', 'administrateur')
 def rdv_api_events(request):
     """API pour les événements du calendrier (AJAX)."""

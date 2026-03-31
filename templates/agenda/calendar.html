@@ -3,6 +3,27 @@
 {% block title %}Agenda - OphtalmoClinique{% endblock %}
 {% block page_title %}<i class="bi bi-calendar3 me-2"></i>Agenda{% endblock %}
 
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.11/locales/fr.global.min.js"></script>
+<style>
+    #calendar { min-height: 600px; }
+    .fc .fc-toolbar-title { font-size: 1.1rem; font-weight: 600; }
+    .fc .fc-button { border-radius: 6px !important; font-size: 0.8rem; }
+    .fc-event { cursor: pointer; font-size: 0.78rem; }
+    body.dark-mode .fc { color: #e9ecef; }
+    body.dark-mode .fc-theme-standard td,
+    body.dark-mode .fc-theme-standard th,
+    body.dark-mode .fc-theme-standard .fc-scrollgrid { border-color: #495057 !important; }
+    body.dark-mode .fc-col-header-cell,
+    body.dark-mode .fc-timegrid-slot { background-color: #2d3238 !important; }
+    body.dark-mode .fc-day-today { background-color: rgba(13, 110, 253, 0.1) !important; }
+    body.dark-mode .fc-toolbar-title { color: #e9ecef; }
+    body.dark-mode .fc .fc-button-primary { background-color: #0d6efd; border-color: #0d6efd; }
+</style>
+{% endblock %}
+
 {% block header_actions %}
 {% if user.is_secretaire or user.is_administrateur or user.is_superuser or user.is_medecin %}
 <a href="{% url 'agenda:rdv_create' %}" class="btn btn-primary btn-sm">
@@ -12,31 +33,14 @@
 {% endblock %}
 
 {% block content %}
-<!-- Navigation semaine -->
+
+<!-- Filtre médecin -->
 <div class="card border-0 shadow-sm mb-3">
     <div class="card-body py-2">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <div class="d-flex align-items-center gap-2">
-                <a href="?semaine={{ week_offset|add:'-1' }}{% if selected_medecin_id %}&medecin={{ selected_medecin_id }}{% endif %}" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-chevron-left"></i>
-                </a>
-                <h6 class="mb-0 fw-semibold">
-                    Semaine du {{ start_of_week|date:"d/m/Y" }} au {{ end_of_week|date:"d/m/Y" }}
-                </h6>
-                <a href="?semaine={{ week_offset|add:'1' }}{% if selected_medecin_id %}&medecin={{ selected_medecin_id }}{% endif %}" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-chevron-right"></i>
-                </a>
-                {% if week_offset != 0 %}
-                <a href="?semaine=0{% if selected_medecin_id %}&medecin={{ selected_medecin_id }}{% endif %}" class="btn btn-outline-primary btn-sm">
-                    <i class="bi bi-house me-1"></i>Aujourd'hui
-                </a>
-                {% endif %}
-            </div>
-            <!-- Filtre médecin -->
-            <form method="get" class="d-flex align-items-center gap-2">
-                <input type="hidden" name="semaine" value="{{ week_offset }}">
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+            <form method="get" class="d-flex align-items-center gap-2" id="medecinFilterForm">
                 <label class="form-label mb-0 small fw-semibold">Médecin:</label>
-                <select name="medecin" class="form-select form-select-sm" style="min-width:180px;" onchange="this.form.submit()">
+                <select name="medecin" id="medecinFilter" class="form-select form-select-sm" style="min-width:180px;">
                     <option value="">Tous les médecins</option>
                     {% for m in medecins %}
                     <option value="{{ m.pk }}" {% if selected_medecin_id == m.pk|stringformat:"s" %}selected{% endif %}>
@@ -45,87 +49,140 @@
                     {% endfor %}
                 </select>
             </form>
+            <!-- Légende -->
+            <div class="d-flex gap-3 flex-wrap ms-auto">
+                <small class="d-flex align-items-center gap-1">
+                    <span style="width:12px;height:12px;border-radius:3px;background:#0d6efd;display:inline-block;"></span> Programmé
+                </small>
+                <small class="d-flex align-items-center gap-1">
+                    <span style="width:12px;height:12px;border-radius:3px;background:#198754;display:inline-block;"></span> Effectué
+                </small>
+                <small class="d-flex align-items-center gap-1">
+                    <span style="width:12px;height:12px;border-radius:3px;background:#dc3545;display:inline-block;"></span> Annulé
+                </small>
+                <small class="d-flex align-items-center gap-1">
+                    <span style="width:12px;height:12px;border-radius:3px;background:#ffc107;display:inline-block;"></span> Non présenté
+                </small>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Calendrier hebdomadaire -->
+<!-- FullCalendar -->
 <div class="card border-0 shadow-sm">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-bordered mb-0 calendar-table">
-                <thead>
-                    <tr>
-                        <th class="text-center bg-light" style="width:60px;">Heure</th>
-                        {% for day in days %}
-                        <th class="text-center {% if day.is_today %}bg-primary bg-opacity-10{% else %}bg-light{% endif %}" style="min-width:120px;">
-                            <div class="fw-semibold">{{ day.date|date:"l"|capfirst }}</div>
-                            <div class="{% if day.is_today %}text-primary fw-bold{% else %}text-muted{% endif %}" style="font-size:0.85rem;">
-                                {{ day.date|date:"d/m" }}
-                            </div>
-                            {% if day.is_today %}<div><span class="badge bg-primary" style="font-size:0.6rem;">Aujourd'hui</span></div>{% endif %}
-                        </th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for slot in time_slots %}
-                    <tr style="height:40px;">
-                        <td class="text-center text-muted small align-middle bg-light border-end fw-semibold" style="font-size:0.75rem;">
-                            {{ slot }}
-                        </td>
-                        {% for day in days %}
-                        <td class="p-0 position-relative {% if day.is_today %}bg-primary bg-opacity-5{% endif %}"
-                            style="cursor:pointer;"
-                            onclick="createRdv('{{ day.date|date:"Y-m-d" }}T{{ slot }}')">
-                            {% for rdv in day.rdv %}
-                                {% with rdv_time=rdv.date_heure|date:"H:i" %}
-                                {% if rdv_time == slot %}
-                                <a href="{% url 'agenda:rdv_detail' rdv.pk %}"
-                                   class="rdv-block d-block text-decoration-none p-1 m-1 rounded
-                                   {% if rdv.statut == 'programme' %}rdv-programme{% elif rdv.statut == 'effectue' %}rdv-effectue{% elif rdv.statut == 'annule' %}rdv-annule{% else %}rdv-non-presente{% endif %}"
-                                   onclick="event.stopPropagation();"
-                                   title="{{ rdv.patient.nom_complet }} — {{ rdv.motif|default:'Sans motif' }}">
-                                    <div class="fw-semibold text-truncate" style="font-size:0.75rem;">{{ rdv.patient.nom_complet }}</div>
-                                    <div class="text-truncate" style="font-size:0.7rem; opacity:0.8;">
-                                        {{ rdv.duree }}min{% if rdv.motif %} — {{ rdv.motif|truncatechars:20 }}{% endif %}
-                                    </div>
-                                </a>
-                                {% endif %}
-                                {% endwith %}
-                            {% endfor %}
-                        </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <div class="card-body">
+        <div id="calendar"></div>
     </div>
 </div>
 
-<!-- Légende -->
-<div class="d-flex gap-3 mt-2 flex-wrap">
-    <small class="d-flex align-items-center gap-1">
-        <span class="badge rdv-programme" style="width:12px;height:12px;border-radius:2px;">&nbsp;</span> Programmé
-    </small>
-    <small class="d-flex align-items-center gap-1">
-        <span class="badge rdv-effectue" style="width:12px;height:12px;border-radius:2px;">&nbsp;</span> Effectué
-    </small>
-    <small class="d-flex align-items-center gap-1">
-        <span class="badge rdv-annule" style="width:12px;height:12px;border-radius:2px;">&nbsp;</span> Annulé
-    </small>
-    <small class="d-flex align-items-center gap-1">
-        <span class="badge rdv-non-presente" style="width:12px;height:12px;border-radius:2px;">&nbsp;</span> Non présenté
-    </small>
-    <small class="text-muted ms-2"><i class="bi bi-info-circle me-1"></i>Cliquez sur un créneau vide pour créer un RDV</small>
-</div>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
-function createRdv(datetime) {
-    window.location.href = "{% url 'agenda:rdv_create' %}?date=" + datetime;
-}
+(function () {
+    'use strict';
+
+    var calendarEl = document.getElementById('calendar');
+    var medecinFilter = document.getElementById('medecinFilter');
+
+    function buildEventsUrl(info, successCallback, failureCallback) {
+        var medecin = medecinFilter ? medecinFilter.value : '';
+        var url = '/agenda/api/events/?start=' + encodeURIComponent(info.startStr) + '&end=' + encodeURIComponent(info.endStr);
+        if (medecin) url += '&medecin=' + encodeURIComponent(medecin);
+
+        fetch(url, { credentials: 'same-origin' })
+            .then(function (r) { return r.json(); })
+            .then(function (data) { successCallback(data); })
+            .catch(function (err) { failureCallback(err); });
+    }
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: 'fr',
+        initialView: 'timeGridWeek',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        slotMinTime: '07:00:00',
+        slotMaxTime: '20:00:00',
+        businessHours: {
+            daysOfWeek: [1, 2, 3, 4, 5, 6],
+            startTime: '08:00',
+            endTime: '19:00',
+        },
+        height: 'auto',
+        editable: {% if user.is_secretaire or user.is_administrateur or user.is_superuser %}true{% else %}false{% endif %},
+        selectable: true,
+        allDaySlot: false,
+        nowIndicator: true,
+        events: buildEventsUrl,
+
+        eventClick: function (info) {
+            info.jsEvent.preventDefault();
+            if (info.event.url) {
+                window.location.href = info.event.url;
+            }
+        },
+
+        select: function (info) {
+            var dateStr = info.startStr.replace(/\+.*$/, '').replace(/Z$/, '');
+            window.location.href = "{% url 'agenda:rdv_create' %}?date=" + encodeURIComponent(dateStr);
+        },
+
+        eventDrop: function (info) {
+            var csrfToken = getCsrfToken();
+            fetch('/agenda/api/events/' + info.event.id + '/move/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({ start: info.event.startStr }),
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (!data.success) {
+                    info.revert();
+                    showToast('Erreur lors du déplacement du RDV', 'danger');
+                } else {
+                    showToast('RDV déplacé avec succès', 'success');
+                }
+            })
+            .catch(function () {
+                info.revert();
+                showToast('Erreur réseau', 'danger');
+            });
+        },
+
+        eventDidMount: function (info) {
+            var props = info.event.extendedProps;
+            var tooltip = (props.motif ? props.motif + ' — ' : '') + 'Dr ' + (props.medecin || '');
+            info.el.setAttribute('title', tooltip);
+        },
+    });
+
+    calendar.render();
+
+    // Refresh when medecin filter changes
+    if (medecinFilter) {
+        medecinFilter.addEventListener('change', function () {
+            calendar.refetchEvents();
+        });
+    }
+
+    function getCsrfToken() {
+        var name = 'csrftoken';
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var c = cookies[i].trim();
+            if (c.startsWith(name + '=')) {
+                return decodeURIComponent(c.substring(name.length + 1));
+            }
+        }
+        return '';
+    }
+})();
 </script>
 {% endblock %}

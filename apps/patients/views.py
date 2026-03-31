@@ -226,6 +226,27 @@ def patient_export_pdf_view(request, pk):
 
 
 @login_required
+@role_required('secretaire', 'administrateur')
+def patient_export_csv_view(request):
+    """Export de la liste des patients en CSV."""
+    import csv
+    from django.http import HttpResponse
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="patients.csv"'
+    response.write('\ufeff')  # BOM UTF-8 pour Excel
+    writer = csv.writer(response, delimiter=';')
+    writer.writerow(['ID', 'Nom', 'Prénom', 'Date naissance', 'Sexe', 'Téléphone', 'Email', 'Statut', 'Allergies'])
+    for p in Patient.objects.all().order_by('nom', 'prenom'):
+        writer.writerow([
+            p.pk, p.nom, p.prenom, p.date_naissance.strftime('%d/%m/%Y'),
+            p.get_sexe_display(), p.telephone, p.email or '',
+            p.get_statut_display(),
+            'Oui' if p.has_allergies else 'Non',
+        ])
+    return response
+
+
+@login_required
 @role_required('medecin', 'secretaire', 'administrateur')
 def patient_search_api(request):
     """API de recherche de patients (AJAX)."""

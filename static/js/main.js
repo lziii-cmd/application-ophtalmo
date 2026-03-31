@@ -240,6 +240,85 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /* ============================================================
+   Dark Mode
+   ============================================================ */
+
+function toggleDarkMode() {
+    const isDark = document.body.classList.toggle('dark-mode');
+    const icon = document.getElementById('darkModeIcon');
+    if (icon) {
+        icon.className = isDark ? 'bi bi-sun-fill fs-5' : 'bi bi-moon-stars-fill fs-5';
+    }
+    localStorage.setItem('darkMode', isDark ? '1' : '0');
+}
+
+// Restore dark mode preference on load
+(function () {
+    if (localStorage.getItem('darkMode') === '1') {
+        document.body.classList.add('dark-mode');
+        // Icon will be updated after DOM is ready
+        document.addEventListener('DOMContentLoaded', function () {
+            const icon = document.getElementById('darkModeIcon');
+            if (icon) icon.className = 'bi bi-sun-fill fs-5';
+        });
+    }
+})();
+
+/* ============================================================
+   Sortable table columns (TÂCHE 10)
+   ============================================================ */
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('th.sortable').forEach(function (th) {
+        th.addEventListener('click', function () {
+            const table = th.closest('table');
+            const tbody = table.querySelector('tbody');
+            if (!tbody) return;
+
+            const colIndex = Array.from(th.parentElement.children).indexOf(th);
+            const isAsc = th.classList.contains('sort-asc');
+
+            // Reset all
+            table.querySelectorAll('th.sortable').forEach(function (h) {
+                h.classList.remove('sort-asc', 'sort-desc');
+            });
+
+            th.classList.add(isAsc ? 'sort-desc' : 'sort-asc');
+            const ascending = !isAsc;
+
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            rows.sort(function (a, b) {
+                const aCell = a.children[colIndex];
+                const bCell = b.children[colIndex];
+                if (!aCell || !bCell) return 0;
+                const aText = aCell.textContent.trim().toLowerCase();
+                const bText = bCell.textContent.trim().toLowerCase();
+
+                // Try numeric sort
+                const aNum = parseFloat(aText.replace(/[^\d.,]/g, '').replace(',', '.'));
+                const bNum = parseFloat(bText.replace(/[^\d.,]/g, '').replace(',', '.'));
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    return ascending ? aNum - bNum : bNum - aNum;
+                }
+                // Try date sort (dd/mm/yyyy)
+                const dateRe = /^\d{2}\/\d{2}\/\d{4}$/;
+                if (dateRe.test(aText) && dateRe.test(bText)) {
+                    const toDate = function (s) {
+                        const p = s.split('/');
+                        return new Date(p[2], p[1] - 1, p[0]);
+                    };
+                    return ascending ? toDate(aText) - toDate(bText) : toDate(bText) - toDate(aText);
+                }
+                // String sort
+                return ascending ? aText.localeCompare(bText, 'fr') : bText.localeCompare(aText, 'fr');
+            });
+
+            rows.forEach(function (row) { tbody.appendChild(row); });
+        });
+    });
+});
+
+/* ============================================================
    Global utility functions
    ============================================================ */
 

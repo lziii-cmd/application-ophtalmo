@@ -16,6 +16,24 @@ from reportlab.platypus import (
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
 
 
+def make_qr_image(data_str):
+    """Génère un QR code en mémoire et retourne un ImageReader ReportLab."""
+    try:
+        import qrcode
+        import io
+        from reportlab.lib.utils import ImageReader
+        qr = qrcode.QRCode(version=1, box_size=4, border=2)
+        qr.add_data(data_str)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+        buf = io.BytesIO()
+        img.save(buf, format='PNG')
+        buf.seek(0)
+        return ImageReader(buf)
+    except ImportError:
+        return None
+
+
 def get_styles():
     """Retourne les styles personnalisés pour les PDF médicaux."""
     styles = getSampleStyleSheet()
@@ -169,6 +187,29 @@ def generate_prescription_pdf(prescription):
     Retourne un HttpResponse avec le contenu PDF.
     """
     buffer = BytesIO()
+
+    medecin = prescription.medecin
+    patient = prescription.consultation.patient
+
+    # Préparer les données QR
+    qr_data = (
+        f"PRESC-{prescription.pk:06d}\n"
+        f"Patient: {patient.nom_complet}\n"
+        f"Médecin: Dr {medecin.get_full_name()}\n"
+        f"Date: {prescription.date_creation.strftime('%d/%m/%Y')}\n"
+        f"Type: {prescription.get_type_prescription_display()}"
+    )
+    qr_img = make_qr_image(qr_data)
+
+    def on_first_page(canvas, doc):
+        """Dessine le QR code en haut à droite sur la première page."""
+        if qr_img:
+            page_width, page_height = A4
+            qr_size = 2.5 * cm
+            x = page_width - doc.rightMargin - qr_size
+            y = page_height - doc.topMargin - qr_size
+            canvas.drawImage(qr_img, x, y, width=qr_size, height=qr_size, preserveAspectRatio=True)
+
     doc = SimpleDocTemplate(
         buffer,
         pagesize=A4,
@@ -176,13 +217,11 @@ def generate_prescription_pdf(prescription):
         leftMargin=2*cm,
         topMargin=2*cm,
         bottomMargin=2*cm,
-        title=f"Prescription - {prescription.consultation.patient.nom_complet}"
+        title=f"Prescription - {patient.nom_complet}"
     )
 
     styles = get_styles()
     story = []
-    medecin = prescription.medecin
-    patient = prescription.consultation.patient
 
     # En-tête
     build_header(story, medecin, styles)
@@ -249,7 +288,7 @@ def generate_prescription_pdf(prescription):
         styles['SmallText']
     ))
 
-    doc.build(story)
+    doc.build(story, onFirstPage=on_first_page)
     buffer.seek(0)
 
     # Marquer comme imprimée

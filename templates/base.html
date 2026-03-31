@@ -13,6 +13,9 @@
     {% load static %}
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
 
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-light">
@@ -29,6 +32,12 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarContent">
             <ul class="navbar-nav ms-auto align-items-center">
+                <!-- Dark mode toggle -->
+                <li class="nav-item me-1">
+                    <button class="btn btn-link nav-link" onclick="toggleDarkMode()" title="Mode sombre">
+                        <i class="bi bi-moon-stars-fill fs-5" id="darkModeIcon"></i>
+                    </button>
+                </li>
                 <!-- Notifications -->
                 {% if notification_count > 0 %}
                 <li class="nav-item dropdown me-2">

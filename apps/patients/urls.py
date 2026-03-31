@@ -16,4 +16,5 @@ urlpatterns = [
     path('<int:pk>/reactiver/', views.patient_reactivate_view, name='reactivate'),
     path('<int:pk>/export-pdf/', views.patient_export_pdf_view, name='export_pdf'),
     path('api/recherche/', views.patient_search_api, name='search_api'),
+    path('export/csv/', views.patient_export_csv_view, name='export_csv'),
 ]

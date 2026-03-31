@@ -20,6 +20,7 @@ urlpatterns = [
     path('audit/', include('apps.audit.urls', namespace='audit')),
     path('sauvegarde/', include('apps.sauvegarde.urls', namespace='sauvegarde')),
     path('dashboard/', include('apps.dashboard.urls', namespace='dashboard')),
+    path('api/', include('apps.api.urls')),
 ]
 
 if settings.DEBUG:
