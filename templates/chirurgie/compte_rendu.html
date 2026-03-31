@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Compte-rendu opératoire - OphtalmoClinique{% endblock %}
+{% block page_title %}<i class="bi bi-file-medical me-2"></i>Compte-rendu opératoire{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'chirurgie:detail' intervention.pk %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left me-1"></i>Retour
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="alert alert-info py-2 mb-3">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>{{ intervention.type_label }}</strong> — {{ intervention.patient.nom_complet }} —
+            {{ intervention.date_planifiee|date:"d/m/Y" }}
+        </div>
+        <form method="post" class="card border-0 shadow-sm">
+            {% csrf_token %}
+            <div class="card-body">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Date de réalisation</label>
+                        {{ form.date_realisation }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Durée (minutes)</label>
+                        {{ form.duree_minutes }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Compte-rendu opératoire</label>
+                    {{ form.compte_rendu }}
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Complications</label>
+                    {{ form.complications }}
+                    <div class="form-text">Laisser vide si aucune complication.</div>
+                </div>
+
+                <h6 class="fw-semibold text-muted text-uppercase mb-3 small border-top pt-3">Acuité visuelle post-opératoire</h6>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Acuité OD</label>
+                        {{ form.acuite_post_op_od }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Acuité OG</label>
+                        {{ form.acuite_post_op_og }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Notes post-opératoires</label>
+                    {{ form.notes_post_op }}
+                </div>
+            </div>
+            <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                <div class="text-muted small">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Les suivis J+1, J+7 et J+30 seront créés automatiquement.
+                </div>
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-1"></i>Valider et marquer réalisée
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

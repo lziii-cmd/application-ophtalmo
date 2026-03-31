@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titre }} - OphtalmoClinique{% endblock %}
+{% block page_title %}<i class="bi bi-scissors me-2"></i>{{ titre }}{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'chirurgie:list' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left me-1"></i>Retour
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <form method="post" class="card border-0 shadow-sm">
+            {% csrf_token %}
+            <div class="card-body">
+
+                <!-- Patient & Chirurgien -->
+                <h6 class="fw-semibold text-muted text-uppercase mb-3 small">Informations générales</h6>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Patient <span class="text-danger">*</span></label>
+                        {{ form.patient }}
+                        {% if form.patient.errors %}<div class="text-danger small mt-1">{{ form.patient.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Chirurgien <span class="text-danger">*</span></label>
+                        {{ form.chirurgien }}
+                        {% if form.chirurgien.errors %}<div class="text-danger small mt-1">{{ form.chirurgien.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Type d'intervention <span class="text-danger">*</span></label>
+                        {{ form.type_intervention }}
+                    </div>
+                    <div class="col-md-6" id="type-autre-div" style="display:none;">
+                        <label class="form-label fw-semibold">Préciser</label>
+                        {{ form.type_autre }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Œil concerné <span class="text-danger">*</span></label>
+                        {{ form.oeil }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Date planifiée <span class="text-danger">*</span></label>
+                        {{ form.date_planifiee }}
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-semibold">Consultation d'origine</label>
+                        {{ form.consultation_origine }}
+                        <div class="form-text">Optionnel — consultation ayant conduit à cette décision opératoire.</div>
+                    </div>
+                </div>
+
+                <!-- Pré-opératoire -->
+                <h6 class="fw-semibold text-muted text-uppercase mb-3 small border-top pt-3">Pré-opératoire</h6>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Anesthésie</label>
+                        {{ form.anesthesie }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Date RDV pré-op</label>
+                        {{ form.date_rdv_pre_op }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Bilan pré-opératoire</label>
+                        {{ form.bilan_pre_op }}
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check">
+                            {{ form.consentement_signe }}
+                            <label class="form-check-label fw-semibold">Consentement éclairé signé</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-white d-flex justify-content-end gap-2">
+                <a href="{% url 'chirurgie:list' %}" class="btn btn-outline-secondary">Annuler</a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle me-1"></i>Enregistrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const typeSelect = document.querySelector('[name="type_intervention"]');
+const autreDiv = document.getElementById('type-autre-div');
+function toggleAutre() {
+    autreDiv.style.display = typeSelect.value === 'autre' ? '' : 'none';
+}
+typeSelect.addEventListener('change', toggleAutre);
+toggleAutre();
+</script>
+{% endblock %}

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'apps.audit.apps.AuditConfig',
     'apps.sauvegarde.apps.SauvegardeConfig',
     'apps.dashboard.apps.DashboardConfig',
+    'apps.chirurgie.apps.ChirurgieConfig',
     'rest_framework',
 ]
 

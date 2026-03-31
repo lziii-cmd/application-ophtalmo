@@ -20,6 +20,7 @@ urlpatterns = [
     path('audit/', include('apps.audit.urls', namespace='audit')),
     path('sauvegarde/', include('apps.sauvegarde.urls', namespace='sauvegarde')),
     path('dashboard/', include('apps.dashboard.urls', namespace='dashboard')),
+    path('chirurgie/', include('apps.chirurgie.urls', namespace='chirurgie')),
     path('api/', include('apps.api.urls')),
 ]
 

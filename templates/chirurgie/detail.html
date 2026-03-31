@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+
+{% block title %}Intervention - OphtalmoClinique{% endblock %}
+{% block page_title %}<i class="bi bi-scissors me-2"></i>Intervention chirurgicale{% endblock %}
+
+{% block header_actions %}
+<div class="d-flex gap-2 flex-wrap">
+    {% if intervention.statut == 'planifiee' %}
+    <a href="{% url 'chirurgie:edit' intervention.pk %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-pencil me-1"></i>Modifier
+    </a>
+    <form method="post" action="{% url 'chirurgie:valider_pre_op' intervention.pk %}" class="d-inline">
+        {% csrf_token %}
+        <button class="btn btn-info btn-sm" onclick="return confirm('Valider le bilan pré-opératoire ?')">
+            <i class="bi bi-clipboard-check me-1"></i>Valider pré-op
+        </button>
+    </form>
+    {% endif %}
+    {% if intervention.statut == 'pre_op_valide' and user.is_medecin %}
+    <a href="{% url 'chirurgie:compte_rendu' intervention.pk %}" class="btn btn-success btn-sm">
+        <i class="bi bi-file-medical me-1"></i>Saisir compte-rendu
+    </a>
+    {% endif %}
+    {% if intervention.statut == 'realisee' and user.is_medecin %}
+    <a href="{% url 'chirurgie:suivi_create' intervention.pk %}" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-plus me-1"></i>Ajouter suivi
+    </a>
+    {% endif %}
+    {% if intervention.statut not in 'realisee,annulee' %}
+    <form method="post" action="{% url 'chirurgie:annuler' intervention.pk %}" class="d-inline">
+        {% csrf_token %}
+        <button class="btn btn-outline-danger btn-sm" onclick="return confirm('Annuler cette intervention ?')">
+            <i class="bi bi-x-circle me-1"></i>Annuler
+        </button>
+    </form>
+    {% endif %}
+    <a href="{% url 'chirurgie:list' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Retour
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+    <!-- Colonne principale -->
+    <div class="col-lg-8">
+
+        <!-- En-tête -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            <a href="{% url 'patients:detail' intervention.patient.pk %}" class="text-decoration-none text-dark">
+                                {{ intervention.patient.nom_complet }}
+                            </a>
+                        </h5>
+                        <p class="text-muted mb-0">
+                            <i class="bi bi-scissors me-1"></i>{{ intervention.type_label }}
+                            <span class="mx-2">|</span>
+                            <i class="bi bi-eye me-1"></i>{{ intervention.get_oeil_display }}
+                            <span class="mx-2">|</span>
+                            <i class="bi bi-calendar me-1"></i>{{ intervention.date_planifiee|date:"d/m/Y à H:i" }}
+                        </p>
+                    </div>
+                    <span class="badge fs-6 bg-{{ intervention.statut_couleur }}">
+                        {{ intervention.get_statut_display }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pré-opératoire -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-clipboard2-pulse me-2 text-info"></i>Pré-opératoire</h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="text-muted small fw-semibold text-uppercase">Anesthésie</label>
+                        <div class="mt-1">{{ intervention.get_anesthesie_display|default:"—" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="text-muted small fw-semibold text-uppercase">Consentement</label>
+                        <div class="mt-1">
+                            {% if intervention.consentement_signe %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check-circle me-1"></i>Signé</span>
+                            {% else %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="bi bi-x-circle me-1"></i>Non signé</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="text-muted small fw-semibold text-uppercase">RDV pré-op</label>
+                        <div class="mt-1">{{ intervention.date_rdv_pre_op|date:"d/m/Y"|default:"—" }}</div>
+                    </div>
+                    {% if intervention.bilan_pre_op %}
+                    <div class="col-12">
+                        <label class="text-muted small fw-semibold text-uppercase">Bilan pré-opératoire</label>
+                        <div class="mt-1">{{ intervention.bilan_pre_op }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Compte-rendu opératoire -->
+        {% if intervention.statut == 'realisee' %}
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-file-medical me-2 text-success"></i>Compte-rendu opératoire</h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label class="text-muted small fw-semibold text-uppercase">Date de réalisation</label>
+                        <div class="mt-1">{{ intervention.date_realisation|date:"d/m/Y à H:i"|default:"—" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="text-muted small fw-semibold text-uppercase">Durée</label>
+                        <div class="mt-1">{{ intervention.duree_minutes|default:"—" }} {% if intervention.duree_minutes %}min{% endif %}</div>
+                    </div>
+                </div>
+                {% if intervention.compte_rendu %}
+                <div class="mb-3">
+                    <label class="text-muted small fw-semibold text-uppercase">Compte-rendu</label>
+                    <div class="mt-1">{{ intervention.compte_rendu }}</div>
+                </div>
+                {% endif %}
+                {% if intervention.complications %}
+                <div class="alert alert-warning py-2">
+                    <strong><i class="bi bi-exclamation-triangle me-1"></i>Complications :</strong>
+                    <div class="mt-1">{{ intervention.complications }}</div>
+                </div>
+                {% endif %}
+                {% if intervention.acuite_post_op_od or intervention.acuite_post_op_og %}
+                <div>
+                    <label class="text-muted small fw-semibold text-uppercase">Acuité post-opératoire</label>
+                    <div class="row g-2 mt-1">
+                        <div class="col-auto">
+                            <span class="badge bg-light text-dark border">OD : {{ intervention.acuite_post_op_od|default:"—" }}</span>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge bg-light text-dark border">OG : {{ intervention.acuite_post_op_og|default:"—" }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Suivis post-opératoires -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-calendar-check me-2 text-primary"></i>Suivis post-opératoires</h6>
+                {% if user.is_medecin %}
+                <a href="{% url 'chirurgie:suivi_create' intervention.pk %}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus"></i>
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-body p-0">
+                {% if suivis %}
+                <div class="list-group list-group-flush">
+                    {% for s in suivis %}
+                    <div class="list-group-item py-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="fw-semibold">{{ s.get_type_suivi_display }} — {{ s.date_prevue|date:"d/m/Y" }}</div>
+                                {% if s.realise %}
+                                <div class="text-muted small">
+                                    Réalisé le {{ s.date_realisation|date:"d/m/Y"|default:"—" }}
+                                    {% if s.acuite_od or s.acuite_og %}
+                                    — OD: {{ s.acuite_od|default:"—" }} / OG: {{ s.acuite_og|default:"—" }}
+                                    {% endif %}
+                                </div>
+                                {% if s.notes %}
+                                <div class="text-muted small mt-1">{{ s.notes }}</div>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                            {% if s.realise %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">Réalisé</span>
+                            {% else %}
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle">En attente</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-3 text-muted">
+                    <small>Aucun suivi enregistré</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Colonne droite -->
+    <div class="col-lg-4">
+        <!-- Infos patient -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-person me-2"></i>Patient</h6>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0" style="font-size:0.875rem;">
+                    <dt class="col-5 text-muted">Nom</dt>
+                    <dd class="col-7">
+                        <a href="{% url 'patients:detail' intervention.patient.pk %}" class="text-decoration-none">
+                            {{ intervention.patient.nom_complet }}
+                        </a>
+                    </dd>
+                    <dt class="col-5 text-muted">Âge</dt>
+                    <dd class="col-7">{{ intervention.patient.age }} ans</dd>
+                    <dt class="col-5 text-muted">Tél</dt>
+                    <dd class="col-7">{{ intervention.patient.telephone }}</dd>
+                </dl>
+                {% if intervention.patient.has_allergies %}
+                <div class="alert alert-warning py-2 mt-2 mb-0">
+                    <strong><i class="bi bi-exclamation-triangle me-1"></i>Allergies:</strong>
+                    <div class="small mt-1">{{ intervention.patient.allergies }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Chirurgien -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-person-badge me-2"></i>Chirurgien</h6>
+            </div>
+            <div class="card-body" style="font-size:0.875rem;">
+                <strong>Dr {{ intervention.chirurgien.get_full_name }}</strong>
+                {% if intervention.chirurgien.specialite %}
+                <div class="text-muted">{{ intervention.chirurgien.specialite }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- RDV lié -->
+        {% if intervention.rdv_operation %}
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-calendar me-2"></i>Rendez-vous</h6>
+            </div>
+            <div class="card-body" style="font-size:0.875rem;">
+                <strong>{{ intervention.rdv_operation.date_heure|date:"d/m/Y à H:i" }}</strong>
+                <div class="text-muted">{{ intervention.rdv_operation.motif|default:"Opération" }}</div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-calendar me-2"></i>Rendez-vous</h6>
+                <a href="{% url 'agenda:rdv_create' %}?patient={{ intervention.patient.pk }}" class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-calendar-plus me-1"></i>Planifier
+                </a>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-0">Aucun RDV lié</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Consultation d'origine -->
+        {% if intervention.consultation_origine %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-clipboard2-pulse me-2"></i>Consultation d'origine</h6>
+            </div>
+            <div class="card-body" style="font-size:0.875rem;">
+                <a href="{% url 'consultations:detail' intervention.consultation_origine.pk %}" class="text-decoration-none">
+                    {{ intervention.consultation_origine.date_heure|date:"d/m/Y" }}
+                </a>
+                <div class="text-muted">{{ intervention.consultation_origine.diagnostic_principal|default:"—" }}</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

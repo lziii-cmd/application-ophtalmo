@@ -136,6 +136,9 @@
                 <a href="{% url 'consultations:create' %}?patient={{ patient.pk }}" class="btn btn-outline-primary btn-sm">
                     <i class="bi bi-clipboard2-plus me-1"></i>Nouvelle consultation
                 </a>
+                <a href="{% url 'chirurgie:create' %}?patient={{ patient.pk }}" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-scissors me-1"></i>Planifier une intervention
+                </a>
                 {% endif %}
                 {% if user.is_administrateur or user.is_superuser %}
                 {% if patient.statut == 'actif' %}

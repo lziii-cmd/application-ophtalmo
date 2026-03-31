@@ -160,6 +160,16 @@
 
                 {% if user.is_medecin or user.is_secretaire or user.is_administrateur or user.is_superuser %}
                 <li class="nav-item">
+                    <a class="nav-link sidebar-link {% if request.resolver_match.namespace == 'chirurgie' %}active{% endif %}"
+                       href="{% url 'chirurgie:list' %}">
+                        <i class="bi bi-scissors"></i>
+                        <span>Chirurgie</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if user.is_medecin or user.is_secretaire or user.is_administrateur or user.is_superuser %}
+                <li class="nav-item">
                     <a class="nav-link sidebar-link {% if request.resolver_match.namespace == 'paiements' %}active{% endif %}"
                        href="{% url 'paiements:list' %}">
                         <i class="bi bi-cash-stack"></i>
