@@ -66,7 +66,7 @@
                 </thead>
                 <tbody>
                     {% for patient in page_obj %}
-                    <tr data-href="{% url 'patients:detail' patient.pk %}"
+                    <tr data-href="{% url 'patients:detail' patient.pk %}">
                         <td><small class="text-muted font-monospace">{{ patient.pk|stringformat:"06d" }}</small></td>
                         <td>
                             <div class="d-flex align-items-center gap-2">

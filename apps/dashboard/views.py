@@ -2,6 +2,7 @@
 Vues pour le tableau de bord principal.
 """
 
+import json
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -147,6 +148,44 @@ def dashboard_index_view(request):
             rdv_aujourd_hui = rdv_aujourd_hui.filter(medecin=user)
 
         context['rdv_aujourd_hui'] = rdv_aujourd_hui
+
+        # Données graphique : consultations par mois sur 6 mois
+        mois_labels = []
+        mois_consultations = []
+        mois_rdv = []
+        for i in range(5, -1, -1):
+            # Calcul propre du 1er du mois i mois en arrière
+            month = today.month - i
+            year = today.year
+            while month <= 0:
+                month += 12
+                year -= 1
+            debut = today.replace(year=year, month=month, day=1)
+            if debut.month == 12:
+                fin = debut.replace(year=debut.year + 1, month=1, day=1)
+            else:
+                fin = debut.replace(month=debut.month + 1, day=1)
+            nb_consult = Consultation.objects.filter(
+                date_heure__date__gte=debut,
+                date_heure__date__lt=fin,
+            ).count()
+            nb_rdv = RendezVous.objects.filter(
+                date_heure__date__gte=debut,
+                date_heure__date__lt=fin,
+            ).count()
+            mois_labels.append(debut.strftime('%b %Y'))
+            mois_consultations.append(nb_consult)
+            mois_rdv.append(nb_rdv)
+
+        # Répartition patients par sexe
+        from apps.patients.models import Patient as PatientModel
+        nb_homme = PatientModel.objects.filter(sexe='M', statut='actif').count()
+        nb_femme = PatientModel.objects.filter(sexe='F', statut='actif').count()
+
+        context['chart_labels'] = json.dumps(mois_labels)
+        context['chart_consultations'] = json.dumps(mois_consultations)
+        context['chart_rdv'] = json.dumps(mois_rdv)
+        context['chart_sexe'] = json.dumps([nb_homme, nb_femme])
 
     except Exception as e:
         import logging

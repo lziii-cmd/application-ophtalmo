@@ -688,7 +688,7 @@ body.dark-mode input::placeholder {
    ============================================================ */
 .table th.sortable { cursor: pointer; user-select: none; }
 .table th.sortable:hover { background-color: #e9ecef; }
-.table th.sortable::after { content: ' \u21c5'; opacity: 0.4; }
+.table th.sortable::after { content: ' \21c5'; opacity: 0.4; }
 .table th.sort-asc::after { content: ' \25b2'; opacity: 1; }
 .table th.sort-desc::after { content: ' \25bc'; opacity: 1; }
 

@@ -216,6 +216,30 @@
 </div>
 {% endif %}
 
+<!-- Graphiques -->
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-bar-chart-line me-2 text-primary"></i>Activité des 6 derniers mois</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="chartActivite" height="110"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-pie-chart me-2 text-success"></i>Patients actifs</h6>
+            </div>
+            <div class="card-body d-flex align-items-center justify-content-center">
+                <canvas id="chartSexe" height="200" style="max-height:200px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- RDV d'aujourd'hui + Raccourcis -->
 <div class="row g-3">
     <!-- RDV du jour -->
@@ -324,4 +348,80 @@
         {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function() {
+    var labels = {{ chart_labels|default:'[]'|safe }};
+    var consultations = {{ chart_consultations|default:'[]'|safe }};
+    var rdv = {{ chart_rdv|default:'[]'|safe }};
+    var sexe = {{ chart_sexe|default:'[0,0]'|safe }};
+
+    var ctxActivite = document.getElementById('chartActivite');
+    if (ctxActivite && labels.length) {
+        new Chart(ctxActivite, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Consultations',
+                        data: consultations,
+                        backgroundColor: 'rgba(13,110,253,0.75)',
+                        borderRadius: 6,
+                        borderSkipped: false,
+                    },
+                    {
+                        label: 'Rendez-vous',
+                        data: rdv,
+                        backgroundColor: 'rgba(25,135,84,0.6)',
+                        borderRadius: 6,
+                        borderSkipped: false,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: { mode: 'index', intersect: false }
+                },
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+            }
+        });
+    }
+
+    var ctxSexe = document.getElementById('chartSexe');
+    if (ctxSexe) {
+        new Chart(ctxSexe, {
+            type: 'doughnut',
+            data: {
+                labels: ['Hommes', 'Femmes'],
+                datasets: [{
+                    data: sexe,
+                    backgroundColor: ['rgba(13,110,253,0.8)', 'rgba(214,51,132,0.8)'],
+                    borderWidth: 2,
+                    borderColor: ['#0d6efd', '#d63384'],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                var total = ctx.dataset.data.reduce(function(a,b){return a+b;},0);
+                                var pct = total > 0 ? Math.round(ctx.parsed/total*100) : 0;
+                                return ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+})();
+</script>
 {% endblock %}

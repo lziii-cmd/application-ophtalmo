@@ -59,7 +59,7 @@
                 </thead>
                 <tbody>
                     {% for p in paiements %}
-                    <tr data-href="{% url 'patients:detail' p.patient.pk %}"
+                    <tr data-href="{% url 'patients:detail' p.patient.pk %}">
                         <td>
                             <a href="{% url 'patients:detail' p.patient.pk %}" class="fw-semibold text-decoration-none text-dark">
                                 {{ p.patient.nom_complet }}

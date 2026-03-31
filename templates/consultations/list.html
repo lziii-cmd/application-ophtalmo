@@ -55,7 +55,7 @@
                 </thead>
                 <tbody>
                     {% for c in consultations %}
-                    <tr data-href="{% url 'consultations:detail' c.pk %}"
+                    <tr data-href="{% url 'consultations:detail' c.pk %}">
                         <td>
                             <a href="{% url 'patients:detail' c.patient.pk %}" class="fw-semibold text-decoration-none text-dark">
                                 {{ c.patient.nom_complet }}
