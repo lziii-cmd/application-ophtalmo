@@ -14,6 +14,57 @@
 {% endif %}
 {% endblock %}
 
+{% block extra_scripts %}
+<script>
+(function () {
+    const qInput = document.querySelector('input[name="q"]');
+    const statutSelect = document.querySelector('select[name="statut"]');
+    const container = document.getElementById('results-container');
+    if (!qInput || !container) return;
+
+    let debounceTimer;
+
+    function doSearch() {
+        const params = new URLSearchParams();
+        if (qInput.value) params.set('q', qInput.value);
+        if (statutSelect && statutSelect.value) params.set('statut', statutSelect.value);
+
+        fetch('?' + params.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(r => r.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newContainer = doc.getElementById('results-container');
+                if (newContainer) {
+                    container.innerHTML = newContainer.innerHTML;
+                    // Re-attach row click handlers
+                    container.querySelectorAll('tr[data-href]').forEach(row => {
+                        row.style.cursor = 'pointer';
+                        row.addEventListener('click', e => {
+                            if (!e.target.closest('a, button')) {
+                                window.location.href = row.dataset.href;
+                            }
+                        });
+                    });
+                }
+                // Keep cursor in input
+                qInput.focus();
+            })
+            .catch(() => {});
+    }
+
+    qInput.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(doSearch, 300);
+    });
+
+    if (statutSelect) {
+        statutSelect.addEventListener('change', doSearch);
+    }
+})();
+</script>
+{% endblock %}
+
 {% block content %}
 <!-- Formulaire de recherche -->
 <div class="card border-0 shadow-sm mb-3">
@@ -44,7 +95,7 @@
 </div>
 
 <!-- Résultats -->
-<div class="card border-0 shadow-sm">
+<div class="card border-0 shadow-sm" id="results-container">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <span class="fw-semibold text-muted small">
             {{ page_obj.paginator.count }} patient(s) trouvé(s)

@@ -32,7 +32,7 @@
                     <i class="bi bi-cash-coin fs-4"></i>
                 </div>
                 <div>
-                    <div class="stat-value">{{ total_montant|default:"0.00" }}€</div>
+                    <div class="stat-value">{{ total_montant|default:"0.00" }} FCFA</div>
                     <div class="stat-label">Total encaissé</div>
                 </div>
             </div>
@@ -67,9 +67,9 @@
                         </td>
                         <td>{{ p.date|date:"d/m/Y" }}</td>
                         <td>
-                            <span class="fw-semibold">{{ p.montant }}€</span>
+                            <span class="fw-semibold">{{ p.montant }} FCFA</span>
                             {% if p.montant_total_du and p.montant_total_du > 0 %}
-                            <div class="text-muted" style="font-size:0.75rem;">/ {{ p.montant_total_du }}€</div>
+                            <div class="text-muted" style="font-size:0.75rem;">/ {{ p.montant_total_du }} FCFA</div>
                             {% endif %}
                         </td>
                         <td>

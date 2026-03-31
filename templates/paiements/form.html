@@ -34,7 +34,7 @@
                             <label class="form-label fw-semibold">{{ form.montant.label }} <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 {{ form.montant }}
-                                <span class="input-group-text">€</span>
+                                <span class="input-group-text">FCFA</span>
                             </div>
                             {% if form.montant.errors %}<div class="text-danger small mt-1">{% for e in form.montant.errors %}{{ e }}{% endfor %}</div>{% endif %}
                         </div>
@@ -43,7 +43,7 @@
                             <label class="form-label fw-semibold">{{ form.montant_total_du.label }}</label>
                             <div class="input-group">
                                 {{ form.montant_total_du }}
-                                <span class="input-group-text">€</span>
+                                <span class="input-group-text">FCFA</span>
                             </div>
                             <div class="form-text">Montant total de l'acte (pour calcul du statut).</div>
                         </div>

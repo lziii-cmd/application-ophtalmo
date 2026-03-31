@@ -235,10 +235,26 @@
         <div class="card border-0 shadow-sm mb-3">
             <div class="card-header bg-white d-flex justify-content-between align-items-center">
                 <h6 class="mb-0 fw-semibold"><i class="bi bi-file-medical me-2 text-primary"></i>Prescriptions</h6>
-                {% if consultation.statut == 'valide' and not is_partial_view %}
-                <a href="{% url 'prescriptions:create' consultation.pk %}?type=lunettes" class="btn btn-sm btn-outline-primary">
-                    <i class="bi bi-plus"></i>
-                </a>
+                {% if not is_partial_view and consultation.statut != 'annule' %}
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="bi bi-plus me-1"></i>Ajouter
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{% url 'prescriptions:create' consultation.pk %}?type=lunettes">
+                            <i class="bi bi-eyeglasses me-2"></i>Lunettes
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'prescriptions:create' consultation.pk %}?type=traitement">
+                            <i class="bi bi-capsule me-2"></i>Traitement médical
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'prescriptions:create' consultation.pk %}?type=examen">
+                            <i class="bi bi-clipboard2-data me-2"></i>Examens complémentaires
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'prescriptions:create' consultation.pk %}?type=lentilles">
+                            <i class="bi bi-circle me-2"></i>Lentilles de contact
+                        </a></li>
+                    </ul>
+                </div>
                 {% endif %}
             </div>
             <div class="card-body p-0">
@@ -294,18 +310,24 @@
             </div>
         </div>
 
-        <!-- Rendez-vous associé -->
-        {% if consultation.rendez_vous %}
+        <!-- Rendez-vous associé / prochain -->
         <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
                 <h6 class="mb-0 fw-semibold"><i class="bi bi-calendar me-2"></i>Rendez-vous</h6>
+                <a href="{% url 'agenda:rdv_create' %}?patient={{ consultation.patient.pk }}"
+                   class="btn btn-sm btn-outline-success" title="Planifier prochain RDV">
+                    <i class="bi bi-calendar-plus me-1"></i>Planifier
+                </a>
             </div>
             <div class="card-body">
+                {% if consultation.rendez_vous %}
                 <p class="mb-1"><strong>{{ consultation.rendez_vous.date_heure|date:"d/m/Y à H:i" }}</strong></p>
                 <p class="text-muted small mb-0">Motif: {{ consultation.rendez_vous.motif|default:"Non précisé" }}</p>
+                {% else %}
+                <p class="text-muted small mb-0"><i class="bi bi-calendar-x me-1 opacity-50"></i>Aucun rendez-vous lié</p>
+                {% endif %}
             </div>
         </div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}
