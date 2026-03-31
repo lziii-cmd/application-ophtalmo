@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} - OphtalmoClinique{% endblock %}
+{% block page_title %}<i class="bi bi-cash-coin me-2"></i>{{ action }}{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'paiements:list' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left me-1"></i>Retour
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form method="post" novalidate id="paiement-form">
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">{{ form.patient.label }} <span class="text-danger">*</span></label>
+                            {{ form.patient }}
+                            {% if form.patient.errors %}<div class="text-danger small mt-1">{% for e in form.patient.errors %}{{ e }}{% endfor %}</div>{% endif %}
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">{{ form.consultation.label }}</label>
+                            {{ form.consultation }}
+                            <div class="form-text">Sélectionnez un patient d'abord pour afficher ses consultations.</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">{{ form.montant.label }} <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                {{ form.montant }}
+                                <span class="input-group-text">€</span>
+                            </div>
+                            {% if form.montant.errors %}<div class="text-danger small mt-1">{% for e in form.montant.errors %}{{ e }}{% endfor %}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">{{ form.montant_total_du.label }}</label>
+                            <div class="input-group">
+                                {{ form.montant_total_du }}
+                                <span class="input-group-text">€</span>
+                            </div>
+                            <div class="form-text">Montant total de l'acte (pour calcul du statut).</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">{{ form.date.label }}</label>
+                            {{ form.date }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">{{ form.type_paiement.label }}</label>
+                            {{ form.type_paiement }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">{{ form.mode_paiement.label }}</label>
+                            {{ form.mode_paiement }}
+                        </div>
+
+                        <div class="col-12" id="ref-group">
+                            <label class="form-label fw-semibold">{{ form.reference_externe.label }}</label>
+                            {{ form.reference_externe }}
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">{{ form.notes.label }}</label>
+                            {{ form.notes }}
+                        </div>
+                    </div>
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger mt-3">
+                        {% for error in form.non_field_errors %}<p class="mb-0">{{ error }}</p>{% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>Enregistrer
+                        </button>
+                        <a href="{% url 'paiements:list' %}" class="btn btn-outline-secondary">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Chargement dynamique des consultations selon le patient sélectionné
+const patientSelect = document.getElementById('{{ form.patient.id_for_label }}');
+const consultationSelect = document.getElementById('{{ form.consultation.id_for_label }}');
+
+patientSelect.addEventListener('change', function() {
+    const patientId = this.value;
+    consultationSelect.innerHTML = '<option value="">---------</option>';
+
+    if (!patientId) return;
+
+    fetch(`/paiements/api/consultations/?patient_id=${patientId}`)
+        .then(r => r.json())
+        .then(data => {
+            data.consultations.forEach(c => {
+                const option = document.createElement('option');
+                option.value = c.id;
+                option.textContent = c.text;
+                consultationSelect.appendChild(option);
+            });
+        })
+        .catch(() => {});
+});
+</script>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Archiver patient - OphtalmoClinique{% endblock %}
+{% block page_title %}<i class="bi bi-archive me-2"></i>Archiver un patient{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm border-warning">
+            <div class="card-body p-4 text-center">
+                <i class="bi bi-exclamation-triangle-fill text-warning display-4 mb-3"></i>
+                <h5 class="fw-bold">Archiver {{ patient.nom_complet }} ?</h5>
+                <p class="text-muted">Ce patient ne sera plus visible dans la liste active mais ses données seront conservées (rétention légale 10 ans).</p>
+                <form method="post" class="d-flex gap-2 justify-content-center mt-3">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-archive me-1"></i>Confirmer l'archivage
+                    </button>
+                    <a href="{% url 'patients:detail' patient.pk %}" class="btn btn-outline-secondary">Annuler</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

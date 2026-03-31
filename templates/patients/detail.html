@@ -1,0 +1,326 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ patient.nom_complet }} - OphtalmoClinique{% endblock %}
+{% block page_title %}<i class="bi bi-folder2-open me-2"></i>Dossier patient{% endblock %}
+
+{% block header_actions %}
+<div class="d-flex gap-2">
+    {% if user.is_secretaire or user.is_administrateur or user.is_superuser %}
+    <a href="{% url 'patients:edit' patient.pk %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-pencil me-1"></i>Modifier
+    </a>
+    {% endif %}
+    {% if user.is_medecin or user.is_administrateur or user.is_superuser %}
+    <a href="{% url 'patients:export_pdf' patient.pk %}" class="btn btn-outline-primary btn-sm" target="_blank">
+        <i class="bi bi-file-pdf me-1"></i>Export PDF
+    </a>
+    {% endif %}
+    <a href="{% url 'patients:list' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Retour
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<!-- Alertes patient -->
+{% for alerte in alertes %}
+<div class="alert alert-{{ alerte.type }} d-flex align-items-center gap-2 mb-3" role="alert">
+    <i class="bi {% if alerte.type == 'warning' %}bi-exclamation-triangle-fill{% elif alerte.type == 'danger' %}bi-x-circle-fill{% else %}bi-info-circle-fill{% endif %} flex-shrink-0"></i>
+    <span>{{ alerte.message }}</span>
+</div>
+{% endfor %}
+
+<div class="row g-3">
+    <!-- Colonne gauche: infos patient -->
+    <div class="col-lg-4">
+        <!-- Carte identité -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body text-center p-4">
+                <div class="avatar-circle avatar-circle-xl mx-auto mb-3 bg-primary text-white">
+                    {{ patient.nom|first }}
+                </div>
+                <h5 class="fw-bold mb-1">{{ patient.nom_complet }}</h5>
+                <p class="text-muted mb-2">
+                    {{ patient.get_sexe_display }} — {{ patient.age }} ans
+                </p>
+                <div class="d-flex justify-content-center gap-2">
+                    {% if patient.statut == 'actif' %}
+                    <span class="badge bg-success-subtle text-success border border-success-subtle">Actif</span>
+                    {% else %}
+                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Archivé</span>
+                    {% endif %}
+                    {% if patient.has_allergies %}
+                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                        <i class="bi bi-exclamation-triangle me-1"></i>Allergies
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-footer bg-light">
+                <div class="row text-center g-0">
+                    <div class="col border-end">
+                        <small class="text-muted d-block">Dossier N°</small>
+                        <strong class="font-monospace">{{ patient.pk|stringformat:"06d" }}</strong>
+                    </div>
+                    <div class="col">
+                        <small class="text-muted d-block">Créé le</small>
+                        <strong>{{ patient.date_creation|date:"d/m/Y" }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coordonnées -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-telephone me-2 text-primary"></i>Coordonnées</h6>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0" style="font-size:0.875rem;">
+                    <dt class="col-5 text-muted">Téléphone</dt>
+                    <dd class="col-7">{{ patient.telephone }}</dd>
+                    <dt class="col-5 text-muted">Email</dt>
+                    <dd class="col-7">{{ patient.email|default:"—" }}</dd>
+                    <dt class="col-5 text-muted">Naissance</dt>
+                    <dd class="col-7">{{ patient.date_naissance|date:"d/m/Y" }}</dd>
+                    {% if patient.adresse %}
+                    <dt class="col-5 text-muted">Adresse</dt>
+                    <dd class="col-7">{{ patient.adresse }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+
+        <!-- Infos médicales -->
+        {% if patient.allergies or patient.antecedents or patient.traitements_en_cours %}
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-heart-pulse me-2 text-danger"></i>Informations médicales</h6>
+            </div>
+            <div class="card-body" style="font-size:0.875rem;">
+                {% if patient.allergies %}
+                <div class="alert alert-warning py-2 px-3 mb-2">
+                    <strong><i class="bi bi-exclamation-triangle me-1"></i>Allergies:</strong>
+                    <div class="mt-1">{{ patient.allergies }}</div>
+                </div>
+                {% endif %}
+                {% if patient.traitements_en_cours %}
+                <div class="mb-2">
+                    <strong class="text-muted">Traitements en cours:</strong>
+                    <div class="mt-1">{{ patient.traitements_en_cours }}</div>
+                </div>
+                {% endif %}
+                {% if patient.antecedents %}
+                <div>
+                    <strong class="text-muted">Antécédents:</strong>
+                    <div class="mt-1">{{ patient.antecedents }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Actions -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body d-grid gap-2">
+                {% if user.is_secretaire or user.is_administrateur or user.is_superuser %}
+                <a href="{% url 'agenda:rdv_create' %}?patient={{ patient.pk }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-calendar-plus me-1"></i>Nouveau rendez-vous
+                </a>
+                <a href="{% url 'paiements:create' %}?patient={{ patient.pk }}" class="btn btn-outline-success btn-sm">
+                    <i class="bi bi-cash-coin me-1"></i>Enregistrer un paiement
+                </a>
+                {% endif %}
+                {% if user.is_medecin or user.is_administrateur or user.is_superuser %}
+                <a href="{% url 'consultations:create' %}?patient={{ patient.pk }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-clipboard2-plus me-1"></i>Nouvelle consultation
+                </a>
+                {% endif %}
+                {% if user.is_administrateur or user.is_superuser %}
+                {% if patient.statut == 'actif' %}
+                <a href="{% url 'patients:archive' patient.pk %}" class="btn btn-outline-warning btn-sm"
+                   onclick="return confirm('Archiver ce patient? Il ne sera plus visible dans la liste active.')">
+                    <i class="bi bi-archive me-1"></i>Archiver le patient
+                </a>
+                {% else %}
+                <a href="{% url 'patients:reactivate' patient.pk %}" class="btn btn-outline-success btn-sm">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i>Réactiver
+                </a>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Colonne droite: historique -->
+    <div class="col-lg-8">
+        <!-- Onglets -->
+        <ul class="nav nav-tabs mb-3" id="patientTabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#consultations-tab">
+                    <i class="bi bi-clipboard2-pulse me-1"></i>Consultations
+                    <span class="badge bg-primary ms-1">{{ consultations|length }}</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#rdv-tab">
+                    <i class="bi bi-calendar3 me-1"></i>Rendez-vous
+                    <span class="badge bg-secondary ms-1">{{ rendez_vous|length }}</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#prescriptions-tab">
+                    <i class="bi bi-file-medical me-1"></i>Prescriptions
+                    <span class="badge bg-secondary ms-1">{{ prescriptions|length }}</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#paiements-tab">
+                    <i class="bi bi-cash-stack me-1"></i>Paiements
+                    <span class="badge bg-secondary ms-1">{{ paiements|length }}</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- Consultations -->
+            <div class="tab-pane fade show active" id="consultations-tab">
+                {% if consultations %}
+                <div class="list-group list-group-flush border rounded">
+                    {% for c in consultations %}
+                    <a href="{% url 'consultations:detail' c.pk %}" class="list-group-item list-group-item-action py-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="fw-semibold">{{ c.date_heure|date:"d/m/Y à H:i" }}</div>
+                                <div class="text-muted small">
+                                    <i class="bi bi-person-badge me-1"></i>Dr {{ c.medecin.get_full_name }}
+                                </div>
+                                {% if not user.is_secretaire %}
+                                <div class="mt-1 text-truncate" style="max-width:400px;">{{ c.diagnostic_principal|truncatechars:80 }}</div>
+                                {% endif %}
+                                {% if c.tension_od_anormale or c.tension_og_anormale %}
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle mt-1">
+                                    <i class="bi bi-exclamation-triangle me-1"></i>Tension anormale
+                                </span>
+                                {% endif %}
+                            </div>
+                            <span class="badge {% if c.statut == 'valide' %}bg-success{% elif c.statut == 'brouillon' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                                {{ c.get_statut_display }}
+                            </span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted border rounded">
+                    <i class="bi bi-clipboard2-x display-5 d-block mb-2 opacity-25"></i>
+                    <p class="mb-0">Aucune consultation enregistrée.</p>
+                    {% if user.is_medecin or user.is_administrateur or user.is_superuser %}
+                    <a href="{% url 'consultations:create' %}?patient={{ patient.pk }}" class="btn btn-sm btn-primary mt-2">
+                        <i class="bi bi-clipboard2-plus me-1"></i>Créer une consultation
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Rendez-vous -->
+            <div class="tab-pane fade" id="rdv-tab">
+                {% if rendez_vous %}
+                <div class="list-group list-group-flush border rounded">
+                    {% for rdv in rendez_vous %}
+                    <a href="{% url 'agenda:rdv_detail' rdv.pk %}" class="list-group-item list-group-item-action py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-semibold">{{ rdv.date_heure|date:"d/m/Y à H:i" }}</div>
+                                <div class="text-muted small">
+                                    <i class="bi bi-clock me-1"></i>{{ rdv.duree }} min
+                                    — Dr {{ rdv.medecin.get_full_name }}
+                                    {% if rdv.motif %} — {{ rdv.motif }}{% endif %}
+                                </div>
+                            </div>
+                            <span class="badge {% if rdv.statut == 'programme' %}bg-primary{% elif rdv.statut == 'effectue' %}bg-success{% elif rdv.statut == 'annule' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                                {{ rdv.get_statut_display }}
+                            </span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted border rounded">
+                    <i class="bi bi-calendar-x display-5 d-block mb-2 opacity-25"></i>
+                    <p class="mb-0">Aucun rendez-vous enregistré.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Prescriptions -->
+            <div class="tab-pane fade" id="prescriptions-tab">
+                {% if prescriptions %}
+                <div class="list-group list-group-flush border rounded">
+                    {% for p in prescriptions %}
+                    <div class="list-group-item py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-semibold">{{ p.get_type_prescription_display }}</div>
+                                <div class="text-muted small">
+                                    {{ p.date_creation|date:"d/m/Y" }}
+                                    — Dr {{ p.medecin.get_full_name }}
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                {% if p.imprimee %}
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                    <i class="bi bi-printer me-1"></i>Imprimée
+                                </span>
+                                {% endif %}
+                                <a href="{% url 'prescriptions:pdf' p.pk %}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                    <i class="bi bi-file-pdf me-1"></i>PDF
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted border rounded">
+                    <i class="bi bi-file-medical display-5 d-block mb-2 opacity-25"></i>
+                    <p class="mb-0">Aucune prescription enregistrée.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Paiements -->
+            <div class="tab-pane fade" id="paiements-tab">
+                {% if paiements %}
+                <div class="list-group list-group-flush border rounded">
+                    {% for p in paiements %}
+                    <div class="list-group-item py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-semibold">{{ p.montant }}€ — {{ p.get_type_paiement_display }}</div>
+                                <div class="text-muted small">
+                                    {{ p.date|date:"d/m/Y" }}
+                                    — {{ p.get_mode_paiement_display }}
+                                    {% if p.reference_externe %} — Réf: {{ p.reference_externe }}{% endif %}
+                                </div>
+                            </div>
+                            <span class="badge {% if p.statut_calcule == 'paye' %}bg-success{% elif p.statut_calcule == 'partiel' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                                {% if p.statut_calcule == 'paye' %}Payé{% elif p.statut_calcule == 'partiel' %}Partiel{% else %}Non payé{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted border rounded">
+                    <i class="bi bi-cash display-5 d-block mb-2 opacity-25"></i>
+                    <p class="mb-0">Aucun paiement enregistré.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

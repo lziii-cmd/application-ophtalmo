@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}Mon Profil - OphtalmoClinique{% endblock %}
+
+{% block page_title %}<i class="bi bi-person-circle me-2"></i>Mon Profil{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Informations du compte -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center p-4">
+                <div class="avatar-circle avatar-circle-xl mx-auto mb-3">
+                    {{ user.first_name|first|default:user.username|first|upper }}
+                </div>
+                <h5 class="fw-bold mb-1">{{ user.get_full_name|default:user.username }}</h5>
+                <span class="badge bg-primary mb-2">{{ user.get_role_display }}</span>
+                {% if user.specialite %}
+                <p class="text-muted small mb-1"><i class="bi bi-hospital me-1"></i>{{ user.specialite }}</p>
+                {% endif %}
+                {% if user.rpps %}
+                <p class="text-muted small mb-1"><i class="bi bi-person-badge me-1"></i>RPPS: {{ user.rpps }}</p>
+                {% endif %}
+                {% if user.telephone %}
+                <p class="text-muted small mb-0"><i class="bi bi-telephone me-1"></i>{{ user.telephone }}</p>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-light">
+                <div class="row text-center g-0">
+                    <div class="col border-end">
+                        <small class="text-muted d-block">Connexions</small>
+                        <strong>—</strong>
+                    </div>
+                    <div class="col">
+                        <small class="text-muted d-block">Actif depuis</small>
+                        <strong>{{ user.date_joined|date:"d/m/Y" }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statut sécurité -->
+        <div class="card border-0 shadow-sm mt-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-shield me-2"></i>Sécurité</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small">Statut du compte</span>
+                    {% if user.is_active %}
+                    <span class="badge bg-success">Actif</span>
+                    {% else %}
+                    <span class="badge bg-danger">Inactif</span>
+                    {% endif %}
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small">Compte verrouillé</span>
+                    {% if user.is_locked %}
+                    <span class="badge bg-danger">Oui</span>
+                    {% else %}
+                    <span class="badge bg-success">Non</span>
+                    {% endif %}
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted small">Tentatives échouées</span>
+                    <span class="badge {% if user.failed_login_count > 0 %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                        {{ user.failed_login_count }}/5
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Changement de mot de passe -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-key me-2"></i>Changer le mot de passe</h6>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Ancien mot de passe</label>
+                        {{ form.old_password }}
+                        {% if form.old_password.errors %}
+                        <div class="text-danger small mt-1">{% for e in form.old_password.errors %}{{ e }}{% endfor %}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nouveau mot de passe</label>
+                        {{ form.new_password1 }}
+                        {% if form.new_password1.errors %}
+                        <div class="text-danger small mt-1">{% for e in form.new_password1.errors %}{{ e }}{% endfor %}</div>
+                        {% endif %}
+                        <div class="form-text">
+                            <i class="bi bi-info-circle me-1"></i>
+                            8 caractères minimum, 1 majuscule, 1 chiffre, 1 caractère spécial.
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Confirmation du nouveau mot de passe</label>
+                        {{ form.new_password2 }}
+                        {% if form.new_password2.errors %}
+                        <div class="text-danger small mt-1">{% for e in form.new_password2.errors %}{{ e }}{% endfor %}</div>
+                        {% endif %}
+                    </div>
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-1"></i>Modifier le mot de passe
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Informations du compte -->
+        <div class="card border-0 shadow-sm mt-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-info-circle me-2"></i>Informations du compte</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-borderless">
+                    <tr>
+                        <td class="text-muted fw-semibold" style="width:40%">Nom d'utilisateur</td>
+                        <td>{{ user.username }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted fw-semibold">Nom complet</td>
+                        <td>{{ user.get_full_name|default:"—" }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted fw-semibold">Email</td>
+                        <td>{{ user.email|default:"—" }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted fw-semibold">Rôle</td>
+                        <td><span class="badge bg-primary">{{ user.get_role_display }}</span></td>
+                    </tr>
+                    {% if user.rpps %}
+                    <tr>
+                        <td class="text-muted fw-semibold">N° RPPS</td>
+                        <td>{{ user.rpps }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td class="text-muted fw-semibold">Membre depuis</td>
+                        <td>{{ user.date_joined|date:"d/m/Y" }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

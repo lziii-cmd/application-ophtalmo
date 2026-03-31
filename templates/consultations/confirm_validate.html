@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Valider consultation - OphtalmoClinique{% endblock %}
+{% block page_title %}<i class="bi bi-check-circle me-2"></i>Valider la consultation{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm border-success">
+            <div class="card-body p-4 text-center">
+                <i class="bi bi-check-circle-fill text-success display-4 mb-3"></i>
+                <h5 class="fw-bold">Valider cette consultation ?</h5>
+                <p class="text-muted">Une fois validée, la consultation ne pourra plus être modifiée. Seule une annulation avec motif sera possible.</p>
+                <div class="alert alert-light border mb-3 text-start">
+                    <strong>{{ consultation.patient.nom_complet }}</strong><br>
+                    <span class="text-muted">{{ consultation.date_heure|date:"d/m/Y à H:i" }}</span><br>
+                    <span class="text-muted small">{{ consultation.diagnostic_principal|truncatechars:80 }}</span>
+                </div>
+                <form method="post" class="d-flex gap-2 justify-content-center">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle me-1"></i>Confirmer la validation
+                    </button>
+                    <a href="{% url 'consultations:detail' consultation.pk %}" class="btn btn-outline-secondary">Annuler</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

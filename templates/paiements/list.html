@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Paiements - OphtalmoClinique{% endblock %}
+{% block page_title %}<i class="bi bi-cash-stack me-2"></i>Paiements{% endblock %}
+
+{% block header_actions %}
+{% if user.is_secretaire or user.is_administrateur or user.is_superuser %}
+<a href="{% url 'paiements:create' %}" class="btn btn-primary btn-sm">
+    <i class="bi bi-plus-lg me-1"></i>Enregistrer un paiement
+</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+{% if patient %}
+<div class="alert alert-info d-flex align-items-center gap-2 mb-3">
+    <i class="bi bi-person-fill flex-shrink-0"></i>
+    <span>Paiements de <strong>{{ patient.nom_complet }}</strong></span>
+    <a href="{% url 'patients:detail' patient.pk %}" class="btn btn-sm btn-outline-info ms-auto">
+        <i class="bi bi-arrow-left me-1"></i>Retour au dossier
+    </a>
+</div>
+{% endif %}
+
+<!-- Résumé -->
+<div class="row g-3 mb-3">
+    <div class="col-sm-4">
+        <div class="card border-0 shadow-sm stat-card stat-card-success">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-success-subtle text-success">
+                    <i class="bi bi-cash-coin fs-4"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ total_montant|default:"0.00" }}€</div>
+                    <div class="stat-label">Total encaissé</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Patient</th>
+                        <th>Date</th>
+                        <th>Montant</th>
+                        <th>Type</th>
+                        <th>Mode</th>
+                        <th>Consultation</th>
+                        <th>Statut</th>
+                        <th>Validé</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in paiements %}
+                    <tr data-href="{% url 'patients:detail' p.patient.pk %}"
+                        <td>
+                            <a href="{% url 'patients:detail' p.patient.pk %}" class="fw-semibold text-decoration-none text-dark">
+                                {{ p.patient.nom_complet }}
+                            </a>
+                        </td>
+                        <td>{{ p.date|date:"d/m/Y" }}</td>
+                        <td>
+                            <span class="fw-semibold">{{ p.montant }}€</span>
+                            {% if p.montant_total_du and p.montant_total_du > 0 %}
+                            <div class="text-muted" style="font-size:0.75rem;">/ {{ p.montant_total_du }}€</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">
+                                {{ p.get_type_paiement_display }}
+                            </span>
+                        </td>
+                        <td>{{ p.get_mode_paiement_display }}</td>
+                        <td>
+                            {% if p.consultation %}
+                            <a href="{% url 'consultations:detail' p.consultation.pk %}" class="text-decoration-none small">
+                                {{ p.consultation.date_heure|date:"d/m/Y" }}
+                            </a>
+                            {% else %}
+                            <span class="text-muted small">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge {% if p.statut_calcule == 'paye' %}bg-success{% elif p.statut_calcule == 'partiel' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                                {% if p.statut_calcule == 'paye' %}Payé
+                                {% elif p.statut_calcule == 'partiel' %}Partiel
+                                {% else %}Non payé{% endif %}
+                            </span>
+                            {% if p.est_impaye_depuis_30_jours %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-1" title="Impayé depuis plus de 30 jours">
+                                <i class="bi bi-exclamation-triangle"></i>&gt;30j
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if p.valide %}
+                            <i class="bi bi-check-circle-fill text-success" title="Validé"></i>
+                            {% else %}
+                            <i class="bi bi-circle text-muted" title="Non validé"></i>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                {% if user.is_secretaire or user.is_administrateur or user.is_superuser %}
+                                {% if not p.valide or user.is_administrateur or user.is_superuser %}
+                                <a href="{% url 'paiements:edit' p.pk %}" class="btn btn-outline-secondary" title="Modifier">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                {% endif %}
+                                {% endif %}
+                                {% if user.is_administrateur or user.is_superuser %}
+                                {% if not p.valide %}
+                                <form method="post" action="{% url 'paiements:validate' p.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-success btn-sm" title="Valider"
+                                            onclick="return confirm('Valider ce paiement?')">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center py-5 text-muted">
+                            <i class="bi bi-cash display-4 d-block mb-2 opacity-25"></i>
+                            Aucun paiement enregistré.
+                            {% if user.is_secretaire or user.is_administrateur or user.is_superuser %}
+                            <div class="mt-2">
+                                <a href="{% url 'paiements:create' %}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-plus me-1"></i>Enregistrer un paiement
+                                </a>
+                            </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Prescription - OphtalmoClinique{% endblock %}
+{% block page_title %}<i class="bi bi-file-medical me-2"></i>{{ prescription.get_type_prescription_display }}{% endblock %}
+
+{% block header_actions %}
+<div class="d-flex gap-2">
+    <a href="{% url 'prescriptions:pdf' prescription.pk %}" class="btn btn-primary btn-sm" target="_blank">
+        <i class="bi bi-file-pdf me-1"></i>Télécharger PDF
+    </a>
+    <a href="{% url 'consultations:detail' prescription.consultation.pk %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Retour consultation
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold">{{ prescription.get_type_prescription_display }}</h6>
+                <div class="d-flex gap-2 align-items-center">
+                    {% if prescription.imprimee %}
+                    <span class="badge bg-success-subtle text-success border border-success-subtle">
+                        <i class="bi bi-printer me-1"></i>Imprimée
+                    </span>
+                    {% endif %}
+                    <small class="text-muted">{{ prescription.date_creation|date:"d/m/Y à H:i" }}</small>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Infos médecin/patient -->
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <h6 class="text-muted small fw-semibold text-uppercase mb-1">Médecin prescripteur</h6>
+                        <div class="fw-semibold">Dr {{ prescription.medecin.get_full_name }}</div>
+                        {% if prescription.medecin.specialite %}<div class="text-muted small">{{ prescription.medecin.specialite }}</div>{% endif %}
+                        {% if prescription.medecin.rpps %}<div class="text-muted small">RPPS: {{ prescription.medecin.rpps }}</div>{% endif %}
+                    </div>
+                    <div class="col-6">
+                        <h6 class="text-muted small fw-semibold text-uppercase mb-1">Patient</h6>
+                        <div class="fw-semibold">{{ prescription.patient.nom_complet }}</div>
+                        <div class="text-muted small">Né(e) le {{ prescription.patient.date_naissance|date:"d/m/Y" }}</div>
+                        <div class="text-muted small">Tél: {{ prescription.patient.telephone }}</div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Contenu selon type -->
+                {% with c=prescription.contenu %}
+                {% if prescription.type_prescription == 'lunettes' %}
+                <h6 class="fw-semibold mb-3">Correction optique prescrite</h6>
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center">
+                        <thead class="table-primary">
+                            <tr><th></th><th>Sphère</th><th>Cylindre</th><th>Axe</th><th>Addition</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th class="text-start">Oeil droit (OD)</th>
+                                <td>{{ c.oeil_droit.sphere|default:"—" }}</td>
+                                <td>{{ c.oeil_droit.cylindre|default:"—" }}</td>
+                                <td>{{ c.oeil_droit.axe|default:"—" }}</td>
+                                <td>{{ c.oeil_droit.addition|default:"—" }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-start">Oeil gauche (OG)</th>
+                                <td>{{ c.oeil_gauche.sphere|default:"—" }}</td>
+                                <td>{{ c.oeil_gauche.cylindre|default:"—" }}</td>
+                                <td>{{ c.oeil_gauche.axe|default:"—" }}</td>
+                                <td>{{ c.oeil_gauche.addition|default:"—" }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                {% elif prescription.type_prescription == 'traitement' %}
+                <h6 class="fw-semibold mb-3">Médicaments prescrits</h6>
+                {% for med in c.medicaments %}
+                <div class="card border mb-2">
+                    <div class="card-body py-2">
+                        <div class="fw-semibold">{{ forloop.counter }}. {{ med.nom }}</div>
+                        <div class="text-muted small">
+                            {% if med.posologie %}<span class="me-3"><i class="bi bi-clock me-1"></i>{{ med.posologie }}</span>{% endif %}
+                            {% if med.duree %}<span class="me-3"><i class="bi bi-calendar me-1"></i>{{ med.duree }}</span>{% endif %}
+                            {% if med.instructions %}<span><i class="bi bi-info-circle me-1"></i>{{ med.instructions }}</span>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted">Aucun médicament.</p>
+                {% endfor %}
+
+                {% elif prescription.type_prescription == 'examen' %}
+                <h6 class="fw-semibold mb-3">Examens complémentaires prescrits</h6>
+                {% for examen in c.examens %}
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="fw-semibold">{{ forloop.counter }}. {{ examen.nom }}</span>
+                    {% if examen.urgence == 'urgent' %}
+                    <span class="badge bg-warning text-dark">Urgent</span>
+                    {% elif examen.urgence == 'tres_urgent' %}
+                    <span class="badge bg-danger">Très urgent</span>
+                    {% endif %}
+                    {% if examen.indication %}
+                    <span class="text-muted small">— {{ examen.indication }}</span>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <p class="text-muted">Aucun examen.</p>
+                {% endfor %}
+
+                {% elif prescription.type_prescription == 'lentilles' %}
+                <h6 class="fw-semibold mb-3">Lentilles de contact</h6>
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center">
+                        <thead class="table-primary">
+                            <tr><th></th><th>Rayon</th><th>Diamètre</th><th>Puissance</th><th>Marque</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th class="text-start">Oeil droit (OD)</th>
+                                <td>{{ c.oeil_droit.rayon|default:"—" }}</td>
+                                <td>{{ c.oeil_droit.diametre|default:"—" }}</td>
+                                <td>{{ c.oeil_droit.puissance|default:"—" }}</td>
+                                <td>{{ c.oeil_droit.marque|default:"—" }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-start">Oeil gauche (OG)</th>
+                                <td>{{ c.oeil_gauche.rayon|default:"—" }}</td>
+                                <td>{{ c.oeil_gauche.diametre|default:"—" }}</td>
+                                <td>{{ c.oeil_gauche.puissance|default:"—" }}</td>
+                                <td>{{ c.oeil_gauche.marque|default:"—" }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% if c.renouvellement %}
+                <p><strong>Renouvellement:</strong> {{ c.renouvellement }}</p>
+                {% endif %}
+                {% endif %}
+
+                {% if c.remarques %}
+                <div class="alert alert-light border mt-3">
+                    <strong>Remarques:</strong> {{ c.remarques }}
+                </div>
+                {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

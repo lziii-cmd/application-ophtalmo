@@ -1,0 +1,374 @@
+{% extends 'base.html' %}
+
+{% block title %}Consultation - OphtalmoClinique{% endblock %}
+{% block page_title %}<i class="bi bi-clipboard2-pulse me-2"></i>Consultation médicale{% endblock %}
+
+{% block header_actions %}
+<div class="d-flex gap-2 flex-wrap">
+    {% if not is_partial_view %}
+    {% if consultation.peut_etre_modifiee %}
+    <a href="{% url 'consultations:edit' consultation.pk %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-pencil me-1"></i>Modifier
+    </a>
+    <form method="post" action="{% url 'consultations:validate' consultation.pk %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success btn-sm"
+                onclick="return confirm('Valider cette consultation? Elle ne pourra plus être modifiée.')">
+            <i class="bi bi-check-circle me-1"></i>Valider
+        </button>
+    </form>
+    {% endif %}
+    {% if consultation.statut != 'annule' %}
+    <a href="{% url 'consultations:cancel' consultation.pk %}" class="btn btn-outline-danger btn-sm">
+        <i class="bi bi-x-circle me-1"></i>Annuler
+    </a>
+    {% endif %}
+    {% if consultation.statut == 'valide' %}
+    <div class="dropdown">
+        <button class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+            <i class="bi bi-file-medical me-1"></i>Prescription
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'prescriptions:create' consultation.pk %}?type=lunettes">
+                <i class="bi bi-eyeglasses me-2"></i>Lunettes
+            </a></li>
+            <li><a class="dropdown-item" href="{% url 'prescriptions:create' consultation.pk %}?type=traitement">
+                <i class="bi bi-capsule me-2"></i>Traitement médical
+            </a></li>
+            <li><a class="dropdown-item" href="{% url 'prescriptions:create' consultation.pk %}?type=examen">
+                <i class="bi bi-clipboard2-data me-2"></i>Examens complémentaires
+            </a></li>
+            <li><a class="dropdown-item" href="{% url 'prescriptions:create' consultation.pk %}?type=lentilles">
+                <i class="bi bi-circle me-2"></i>Lentilles de contact
+            </a></li>
+        </ul>
+    </div>
+    {% endif %}
+    {% endif %}
+    <a href="{% url 'consultations:list' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Retour
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<!-- Alertes -->
+{% for alerte in alertes %}
+<div class="alert alert-{{ alerte.type }} d-flex align-items-center gap-2 mb-3">
+    <i class="bi {% if alerte.type == 'danger' %}bi-exclamation-octagon-fill{% elif alerte.type == 'warning' %}bi-exclamation-triangle-fill{% else %}bi-info-circle-fill{% endif %} flex-shrink-0 fs-5"></i>
+    <span>{{ alerte.message }}</span>
+</div>
+{% endfor %}
+
+<div class="row g-3">
+    <!-- Colonne principale -->
+    <div class="col-lg-8">
+        <!-- En-tête consultation -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            <a href="{% url 'patients:detail' consultation.patient.pk %}" class="text-decoration-none text-dark">
+                                {{ consultation.patient.nom_complet }}
+                            </a>
+                        </h5>
+                        <p class="text-muted mb-0">
+                            <i class="bi bi-calendar me-1"></i>{{ consultation.date_heure|date:"l d/m/Y à H:i"|capfirst }}
+                            <span class="mx-2">|</span>
+                            <i class="bi bi-person-badge me-1"></i>Dr {{ consultation.medecin.get_full_name }}
+                        </p>
+                    </div>
+                    <span class="badge fs-6 {% if consultation.statut == 'valide' %}bg-success{% elif consultation.statut == 'brouillon' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                        {{ consultation.get_statut_display }}
+                    </span>
+                </div>
+                {% if consultation.statut == 'annule' and consultation.motif_annulation %}
+                <div class="alert alert-secondary py-2 mt-2 mb-0">
+                    <strong>Motif d'annulation:</strong> {{ consultation.motif_annulation }}
+                </div>
+                {% endif %}
+                {% if consultation.date_validation %}
+                <div class="text-muted small mt-2">
+                    <i class="bi bi-check-circle me-1 text-success"></i>
+                    Validée le {{ consultation.date_validation|date:"d/m/Y à H:i" }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if not is_partial_view %}
+        <!-- Examens ophtalmologiques -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-eye me-2 text-info"></i>Examens ophtalmologiques</h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <!-- Acuité visuelle -->
+                    <div class="col-md-6">
+                        <h6 class="text-muted small fw-semibold text-uppercase mb-2">Acuité visuelle</h6>
+                        <table class="table table-sm table-bordered text-center mb-0">
+                            <thead class="table-light">
+                                <tr><th></th><th>De loin</th><th>De près</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th class="text-start">OD</th>
+                                    <td class="fw-semibold">{{ consultation.acuite_od_loin|default:"—" }}</td>
+                                    <td>{{ consultation.acuite_od_pres|default:"—" }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-start">OG</th>
+                                    <td class="fw-semibold">{{ consultation.acuite_og_loin|default:"—" }}</td>
+                                    <td>{{ consultation.acuite_og_pres|default:"—" }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Tension oculaire -->
+                    <div class="col-md-6">
+                        <h6 class="text-muted small fw-semibold text-uppercase mb-2">Tension oculaire</h6>
+                        <table class="table table-sm table-bordered text-center mb-0">
+                            <thead class="table-light">
+                                <tr><th></th><th>mmHg</th><th>Statut</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th class="text-start">OD</th>
+                                    <td class="fw-semibold {% if consultation.tension_od_anormale %}text-danger{% endif %}">
+                                        {{ consultation.tension_od|default:"—" }}
+                                    </td>
+                                    <td>
+                                        {% if consultation.tension_od %}
+                                        {% if consultation.tension_od_anormale %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                            <i class="bi bi-exclamation-triangle"></i> Anormal
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle">Normal</span>
+                                        {% endif %}
+                                        {% else %}—{% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="text-start">OG</th>
+                                    <td class="fw-semibold {% if consultation.tension_og_anormale %}text-danger{% endif %}">
+                                        {{ consultation.tension_og|default:"—" }}
+                                    </td>
+                                    <td>
+                                        {% if consultation.tension_og %}
+                                        {% if consultation.tension_og_anormale %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                            <i class="bi bi-exclamation-triangle"></i> Anormal
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle">Normal</span>
+                                        {% endif %}
+                                        {% else %}—{% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="form-text mt-1"><i class="bi bi-info-circle me-1"></i>Norme: 10–21 mmHg</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diagnostic -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-journal-medical me-2 text-success"></i>Diagnostic</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="text-muted small fw-semibold text-uppercase">Diagnostic principal</label>
+                    <div class="mt-1">{{ consultation.diagnostic_principal|default:"—" }}</div>
+                    {% if consultation.code_cim10_principal %}
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle mt-1">
+                        CIM-10: {{ consultation.code_cim10_principal }}
+                    </span>
+                    {% endif %}
+                </div>
+                {% if consultation.actes_realises %}
+                <div class="mb-3">
+                    <label class="text-muted small fw-semibold text-uppercase">Actes réalisés</label>
+                    <div class="mt-1">{{ consultation.actes_realises }}</div>
+                </div>
+                {% endif %}
+                {% if consultation.observations %}
+                <div>
+                    <label class="text-muted small fw-semibold text-uppercase">Observations</label>
+                    <div class="mt-1">{{ consultation.observations }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <!-- Vue partielle secrétaire -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body text-center text-muted py-4">
+                <i class="bi bi-lock display-5 d-block mb-2 opacity-25"></i>
+                <p class="mb-0">Les détails médicaux sont réservés au médecin.</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Graphiques historique -->
+        {% if not is_partial_view and historique_json %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-graph-up me-2 text-primary"></i>Évolution — {{ consultation.patient.nom_complet }}</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="tensionChart" height="120"></canvas>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Colonne droite: prescriptions & infos -->
+    <div class="col-lg-4">
+        <!-- Prescriptions liées -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-file-medical me-2 text-primary"></i>Prescriptions</h6>
+                {% if consultation.statut == 'valide' and not is_partial_view %}
+                <a href="{% url 'prescriptions:create' consultation.pk %}?type=lunettes" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus"></i>
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-body p-0">
+                {% if consultation.prescriptions.all %}
+                <div class="list-group list-group-flush">
+                    {% for p in consultation.prescriptions.all %}
+                    <div class="list-group-item py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="small fw-semibold">{{ p.get_type_prescription_display }}</div>
+                                <div class="text-muted" style="font-size:0.75rem;">{{ p.date_creation|date:"d/m/Y" }}</div>
+                            </div>
+                            <a href="{% url 'prescriptions:pdf' p.pk %}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                <i class="bi bi-file-pdf"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-3 text-muted">
+                    <i class="bi bi-file-x d-block mb-1 opacity-25"></i>
+                    <small>Aucune prescription</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Informations patient -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-person me-2"></i>Patient</h6>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0" style="font-size:0.875rem;">
+                    <dt class="col-5 text-muted">Nom</dt>
+                    <dd class="col-7">
+                        <a href="{% url 'patients:detail' consultation.patient.pk %}" class="text-decoration-none">
+                            {{ consultation.patient.nom_complet }}
+                        </a>
+                    </dd>
+                    <dt class="col-5 text-muted">Âge</dt>
+                    <dd class="col-7">{{ consultation.patient.age }} ans</dd>
+                    <dt class="col-5 text-muted">Tél</dt>
+                    <dd class="col-7">{{ consultation.patient.telephone }}</dd>
+                </dl>
+                {% if consultation.patient.has_allergies %}
+                <div class="alert alert-warning py-2 mt-2 mb-0">
+                    <strong><i class="bi bi-exclamation-triangle me-1"></i>Allergies:</strong>
+                    <div class="small mt-1">{{ consultation.patient.allergies }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Rendez-vous associé -->
+        {% if consultation.rendez_vous %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-calendar me-2"></i>Rendez-vous</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-1"><strong>{{ consultation.rendez_vous.date_heure|date:"d/m/Y à H:i" }}</strong></p>
+                <p class="text-muted small mb-0">Motif: {{ consultation.rendez_vous.motif|default:"Non précisé" }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if not is_partial_view and historique_json %}
+<script>
+const historique = {{ historique_json|safe }};
+if (historique.length > 1) {
+    const labels = historique.map(h => h.date);
+    const tensionOD = historique.map(h => h.tension_od);
+    const tensionOG = historique.map(h => h.tension_og);
+
+    new Chart(document.getElementById('tensionChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Tension OD (mmHg)',
+                    data: tensionOD,
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13,110,253,0.1)',
+                    tension: 0.3,
+                    fill: false,
+                },
+                {
+                    label: 'Tension OG (mmHg)',
+                    data: tensionOG,
+                    borderColor: '#198754',
+                    backgroundColor: 'rgba(25,135,84,0.1)',
+                    tension: 0.3,
+                    fill: false,
+                },
+                {
+                    label: 'Limite haute (21)',
+                    data: labels.map(() => 21),
+                    borderColor: '#dc3545',
+                    borderDash: [5, 5],
+                    borderWidth: 1,
+                    pointRadius: 0,
+                    fill: false,
+                },
+                {
+                    label: 'Limite basse (10)',
+                    data: labels.map(() => 10),
+                    borderColor: '#fd7e14',
+                    borderDash: [5, 5],
+                    borderWidth: 1,
+                    pointRadius: 0,
+                    fill: false,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } },
+            scales: {
+                y: { min: 0, max: 35, title: { display: true, text: 'mmHg' } }
+            }
+        }
+    });
+}
+</script>
+{% endif %}
+{% endblock %}

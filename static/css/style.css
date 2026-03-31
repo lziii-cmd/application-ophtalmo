@@ -1,0 +1,483 @@
+/* ============================================================
+   OphtalmoClinique - Feuille de style principale
+   Thème médical teal/bleu - Bootstrap 5 override
+   ============================================================ */
+
+:root {
+    --primary: #0d6efd;
+    --primary-dark: #0a58ca;
+    --teal: #0dcaf0;
+    --sidebar-width: 240px;
+    --sidebar-collapsed-width: 60px;
+    --header-height: 56px;
+    --font-base: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+body {
+    font-family: var(--font-base);
+    font-size: 0.9rem;
+    background-color: #f0f4f8;
+    color: #212529;
+}
+
+/* ============================================================
+   Login Page
+   ============================================================ */
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0d6efd 0%, #0a3d91 50%, #051d47 100%);
+}
+
+.login-container {
+    width: 100%;
+    max-width: 420px;
+    padding: 1rem;
+}
+
+.login-card {
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.login-header {
+    background: linear-gradient(135deg, #0d6efd, #0a3d91);
+    padding: 2rem;
+}
+
+.login-logo {
+    width: 72px;
+    height: 72px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    backdrop-filter: blur(4px);
+}
+
+/* ============================================================
+   Layout: Sidebar + Main
+   ============================================================ */
+.wrapper {
+    min-height: calc(100vh - var(--header-height));
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    min-height: calc(100vh - var(--header-height));
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: sticky;
+    top: var(--header-height);
+    height: calc(100vh - var(--header-height));
+    overflow-y: auto;
+    border-right: 1px solid #e9ecef;
+    z-index: 100;
+    transition: width 0.2s ease;
+}
+
+.sidebar-content {
+    flex: 1;
+}
+
+.sidebar-footer {
+    background: #f8f9fa;
+}
+
+.main-content {
+    min-height: calc(100vh - var(--header-height));
+}
+
+/* Rows cliquables dans les tableaux */
+.table tbody tr.clickable-row {
+    cursor: pointer;
+}
+.table tbody tr.clickable-row:hover {
+    background-color: #eef3ff;
+}
+
+.content-header {
+    position: sticky;
+    top: var(--header-height);
+    z-index: 50;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* ============================================================
+   Sidebar Navigation
+   ============================================================ */
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    color: #495057;
+    font-weight: 500;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    margin-bottom: 2px;
+}
+
+.sidebar-link i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.sidebar-link:hover {
+    background-color: #e7f1ff;
+    color: #0d6efd;
+}
+
+.sidebar-link.active {
+    background-color: #0d6efd;
+    color: #fff;
+}
+
+.sidebar-link.active i {
+    color: #fff;
+}
+
+.sidebar-divider {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #e9ecef;
+}
+
+/* ============================================================
+   Avatar Circle
+   ============================================================ */
+.avatar-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0d6efd, #0a3d91);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+    text-transform: uppercase;
+}
+
+.avatar-circle-sm {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+}
+
+.avatar-circle-xl {
+    width: 72px;
+    height: 72px;
+    font-size: 1.75rem;
+}
+
+/* ============================================================
+   Stat Cards (Dashboard)
+   ============================================================ */
+.stat-card {
+    border-radius: 12px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important;
+}
+
+.stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #212529;
+}
+
+.stat-label {
+    font-size: 0.78rem;
+    color: #6c757d;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.stat-card-primary  { border-left: 4px solid #0d6efd; }
+.stat-card-success  { border-left: 4px solid #198754; }
+.stat-card-warning  { border-left: 4px solid #ffc107; }
+.stat-card-danger   { border-left: 4px solid #dc3545; }
+.stat-card-info     { border-left: 4px solid #0dcaf0; }
+.stat-card-secondary{ border-left: 4px solid #6c757d; }
+
+/* ============================================================
+   Cards
+   ============================================================ */
+.card {
+    border-radius: 12px;
+}
+
+.card-header {
+    border-radius: 12px 12px 0 0 !important;
+    border-bottom: 1px solid #e9ecef;
+    padding: 0.875rem 1.25rem;
+}
+
+/* ============================================================
+   Tables
+   ============================================================ */
+.table th {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6c757d;
+    white-space: nowrap;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9ff;
+}
+
+/* ============================================================
+   Agenda / Calendar
+   ============================================================ */
+.calendar-table {
+    font-size: 0.8rem;
+    table-layout: fixed;
+}
+
+.calendar-table td, .calendar-table th {
+    padding: 4px;
+    vertical-align: top;
+}
+
+.rdv-block {
+    font-size: 0.75rem;
+    line-height: 1.2;
+    border-radius: 4px;
+    overflow: hidden;
+    transition: opacity 0.15s;
+}
+
+.rdv-block:hover {
+    opacity: 0.85;
+}
+
+.rdv-programme {
+    background-color: #cfe2ff;
+    color: #084298;
+    border-left: 3px solid #0d6efd;
+}
+
+.rdv-effectue {
+    background-color: #d1e7dd;
+    color: #0a3622;
+    border-left: 3px solid #198754;
+}
+
+.rdv-annule {
+    background-color: #f8d7da;
+    color: #58151c;
+    border-left: 3px solid #dc3545;
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.rdv-non-presente {
+    background-color: #fff3cd;
+    color: #664d03;
+    border-left: 3px solid #ffc107;
+}
+
+/* ============================================================
+   Forms
+   ============================================================ */
+.form-control:focus,
+.form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+.form-label {
+    font-size: 0.875rem;
+    margin-bottom: 0.35rem;
+    color: #495057;
+}
+
+/* ============================================================
+   Badges
+   ============================================================ */
+.badge {
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+/* ============================================================
+   Notifications dropdown
+   ============================================================ */
+.notification-dropdown {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+}
+
+/* ============================================================
+   Alerts
+   ============================================================ */
+.alert {
+    border-radius: 10px;
+    border-left-width: 4px;
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.15s ease;
+}
+
+.btn-sm {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.65rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0a58ca, #084298);
+    border-color: #0a58ca;
+}
+
+/* ============================================================
+   Pagination
+   ============================================================ */
+.page-link {
+    border-radius: 8px !important;
+    margin: 0 2px;
+    color: #0d6efd;
+}
+
+.page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+/* ============================================================
+   Scrollbar styling (webkit)
+   ============================================================ */
+.sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #dee2e6;
+    border-radius: 4px;
+}
+
+/* ============================================================
+   List groups
+   ============================================================ */
+.list-group-item-action:hover {
+    background-color: #f8f9ff;
+}
+
+/* ============================================================
+   Print styles
+   ============================================================ */
+@media print {
+    .sidebar, .navbar, .content-header, .btn, .no-print {
+        display: none !important;
+    }
+    .main-content {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: -100%;
+        top: var(--header-height);
+        z-index: 1030;
+        transition: left 0.3s ease;
+        height: calc(100vh - var(--header-height));
+    }
+
+    .sidebar.show {
+        left: 0;
+    }
+
+    .main-content {
+        width: 100%;
+    }
+
+    .stat-value {
+        font-size: 1.3rem;
+    }
+}
+
+/* ============================================================
+   Utility
+   ============================================================ */
+.min-width-0 {
+    min-width: 0;
+}
+
+.font-monospace {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Content body padding */
+.content-body {
+    padding-bottom: 3rem;
+}

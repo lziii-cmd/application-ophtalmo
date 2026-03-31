@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}Agenda - OphtalmoClinique{% endblock %}
+{% block page_title %}<i class="bi bi-calendar3 me-2"></i>Agenda{% endblock %}
+
+{% block header_actions %}
+{% if user.is_secretaire or user.is_administrateur or user.is_superuser or user.is_medecin %}
+<a href="{% url 'agenda:rdv_create' %}" class="btn btn-primary btn-sm">
+    <i class="bi bi-calendar-plus me-1"></i>Nouveau RDV
+</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<!-- Navigation semaine -->
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body py-2">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-2">
+                <a href="?semaine={{ week_offset|add:'-1' }}{% if selected_medecin_id %}&medecin={{ selected_medecin_id }}{% endif %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+                <h6 class="mb-0 fw-semibold">
+                    Semaine du {{ start_of_week|date:"d/m/Y" }} au {{ end_of_week|date:"d/m/Y" }}
+                </h6>
+                <a href="?semaine={{ week_offset|add:'1' }}{% if selected_medecin_id %}&medecin={{ selected_medecin_id }}{% endif %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+                {% if week_offset != 0 %}
+                <a href="?semaine=0{% if selected_medecin_id %}&medecin={{ selected_medecin_id }}{% endif %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-house me-1"></i>Aujourd'hui
+                </a>
+                {% endif %}
+            </div>
+            <!-- Filtre médecin -->
+            <form method="get" class="d-flex align-items-center gap-2">
+                <input type="hidden" name="semaine" value="{{ week_offset }}">
+                <label class="form-label mb-0 small fw-semibold">Médecin:</label>
+                <select name="medecin" class="form-select form-select-sm" style="min-width:180px;" onchange="this.form.submit()">
+                    <option value="">Tous les médecins</option>
+                    {% for m in medecins %}
+                    <option value="{{ m.pk }}" {% if selected_medecin_id == m.pk|stringformat:"s" %}selected{% endif %}>
+                        Dr {{ m.get_full_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Calendrier hebdomadaire -->
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-bordered mb-0 calendar-table">
+                <thead>
+                    <tr>
+                        <th class="text-center bg-light" style="width:60px;">Heure</th>
+                        {% for day in days %}
+                        <th class="text-center {% if day.is_today %}bg-primary bg-opacity-10{% else %}bg-light{% endif %}" style="min-width:120px;">
+                            <div class="fw-semibold">{{ day.date|date:"l"|capfirst }}</div>
+                            <div class="{% if day.is_today %}text-primary fw-bold{% else %}text-muted{% endif %}" style="font-size:0.85rem;">
+                                {{ day.date|date:"d/m" }}
+                            </div>
+                            {% if day.is_today %}<div><span class="badge bg-primary" style="font-size:0.6rem;">Aujourd'hui</span></div>{% endif %}
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for slot in time_slots %}
+                    <tr style="height:40px;">
+                        <td class="text-center text-muted small align-middle bg-light border-end fw-semibold" style="font-size:0.75rem;">
+                            {{ slot }}
+                        </td>
+                        {% for day in days %}
+                        <td class="p-0 position-relative {% if day.is_today %}bg-primary bg-opacity-5{% endif %}"
+                            style="cursor:pointer;"
+                            onclick="createRdv('{{ day.date|date:"Y-m-d" }}T{{ slot }}')">
+                            {% for rdv in day.rdv %}
+                                {% with rdv_time=rdv.date_heure|date:"H:i" %}
+                                {% if rdv_time == slot %}
+                                <a href="{% url 'agenda:rdv_detail' rdv.pk %}"
+                                   class="rdv-block d-block text-decoration-none p-1 m-1 rounded
+                                   {% if rdv.statut == 'programme' %}rdv-programme{% elif rdv.statut == 'effectue' %}rdv-effectue{% elif rdv.statut == 'annule' %}rdv-annule{% else %}rdv-non-presente{% endif %}"
+                                   onclick="event.stopPropagation();"
+                                   title="{{ rdv.patient.nom_complet }} — {{ rdv.motif|default:'Sans motif' }}">
+                                    <div class="fw-semibold text-truncate" style="font-size:0.75rem;">{{ rdv.patient.nom_complet }}</div>
+                                    <div class="text-truncate" style="font-size:0.7rem; opacity:0.8;">
+                                        {{ rdv.duree }}min{% if rdv.motif %} — {{ rdv.motif|truncatechars:20 }}{% endif %}
+                                    </div>
+                                </a>
+                                {% endif %}
+                                {% endwith %}
+                            {% endfor %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Légende -->
+<div class="d-flex gap-3 mt-2 flex-wrap">
+    <small class="d-flex align-items-center gap-1">
+        <span class="badge rdv-programme" style="width:12px;height:12px;border-radius:2px;">&nbsp;</span> Programmé
+    </small>
+    <small class="d-flex align-items-center gap-1">
+        <span class="badge rdv-effectue" style="width:12px;height:12px;border-radius:2px;">&nbsp;</span> Effectué
+    </small>
+    <small class="d-flex align-items-center gap-1">
+        <span class="badge rdv-annule" style="width:12px;height:12px;border-radius:2px;">&nbsp;</span> Annulé
+    </small>
+    <small class="d-flex align-items-center gap-1">
+        <span class="badge rdv-non-presente" style="width:12px;height:12px;border-radius:2px;">&nbsp;</span> Non présenté
+    </small>
+    <small class="text-muted ms-2"><i class="bi bi-info-circle me-1"></i>Cliquez sur un créneau vide pour créer un RDV</small>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function createRdv(datetime) {
+    window.location.href = "{% url 'agenda:rdv_create' %}?date=" + datetime;
+}
+</script>
+{% endblock %}

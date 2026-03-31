@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Django
+*.log
+*.pot
+local_settings.py
+db.sqlite3
+data/
+backups/
+staticfiles/
+media/
+
+# Environnements virtuels
+env/
+venv/
+.env
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node.js (si frontend)
+node_modules/
+npm-debug.log
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Misc
+*.bak
+*.tmp

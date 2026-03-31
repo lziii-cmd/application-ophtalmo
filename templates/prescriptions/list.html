@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}Prescriptions - OphtalmoClinique{% endblock %}
+{% block page_title %}<i class="bi bi-file-medical me-2"></i>Prescriptions{% endblock %}
+
+{% block content %}
+<!-- Filtres -->
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body py-2">
+        <form method="get" class="d-flex align-items-center gap-2 flex-wrap">
+            <label class="form-label mb-0 small fw-semibold">Type :</label>
+            <select name="type" class="form-select form-select-sm" style="width:200px;" onchange="this.form.submit()">
+                <option value="">Tous les types</option>
+                <option value="lunettes"   {% if type_filter == 'lunettes' %}selected{% endif %}>Lunettes</option>
+                <option value="traitement" {% if type_filter == 'traitement' %}selected{% endif %}>Traitement médical</option>
+                <option value="examen"     {% if type_filter == 'examen' %}selected{% endif %}>Examen complémentaire</option>
+                <option value="lentilles"  {% if type_filter == 'lentilles' %}selected{% endif %}>Lentilles</option>
+            </select>
+            {% if type_filter %}
+            <a href="{% url 'prescriptions:list' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-x-lg me-1"></i>Effacer
+            </a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <span class="fw-semibold text-muted small">{{ page_obj.paginator.count }} prescription(s)</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Patient</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Médecin</th>
+                        <th>Consultation</th>
+                        <th>Imprimée</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in page_obj %}
+                    <tr data-href="{% url 'prescriptions:detail' p.pk %}">
+                        <td>
+                            <a href="{% url 'patients:detail' p.consultation.patient.pk %}" class="fw-semibold text-decoration-none text-dark">
+                                {{ p.consultation.patient.nom_complet }}
+                            </a>
+                        </td>
+                        <td>
+                            <span class="badge
+                                {% if p.type_prescription == 'lunettes' %}bg-info-subtle text-info border border-info-subtle
+                                {% elif p.type_prescription == 'traitement' %}bg-success-subtle text-success border border-success-subtle
+                                {% elif p.type_prescription == 'examen' %}bg-warning-subtle text-warning border border-warning-subtle
+                                {% else %}bg-secondary-subtle text-secondary border border-secondary-subtle{% endif %}">
+                                <i class="bi
+                                    {% if p.type_prescription == 'lunettes' %}bi-eyeglasses
+                                    {% elif p.type_prescription == 'traitement' %}bi-capsule
+                                    {% elif p.type_prescription == 'examen' %}bi-clipboard2-pulse
+                                    {% else %}bi-eye{% endif %} me-1"></i>
+                                {{ p.get_type_prescription_display }}
+                            </span>
+                        </td>
+                        <td>{{ p.date_creation|date:"d/m/Y" }}</td>
+                        <td>Dr {{ p.medecin.get_full_name }}</td>
+                        <td>
+                            <a href="{% url 'consultations:detail' p.consultation.pk %}" class="text-decoration-none small">
+                                {{ p.consultation.date_heure|date:"d/m/Y" }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if p.imprimee %}
+                            <i class="bi bi-printer-fill text-success" title="Imprimée"></i>
+                            {% else %}
+                            <i class="bi bi-printer text-muted" title="Non imprimée"></i>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'prescriptions:detail' p.pk %}" class="btn btn-outline-primary" title="Voir">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'prescriptions:pdf' p.pk %}" class="btn btn-outline-secondary" title="PDF" target="_blank">
+                                    <i class="bi bi-file-pdf"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-file-medical display-4 d-block mb-2 opacity-25"></i>
+                            Aucune prescription trouvée.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% if page_obj.has_other_pages %}
+    <div class="card-footer bg-white">
+        <nav>
+            <ul class="pagination pagination-sm mb-0 justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?{% if type_filter %}type={{ type_filter }}&{% endif %}page={{ page_obj.previous_page_number }}"><i class="bi bi-chevron-left"></i></a>
+                </li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?{% if type_filter %}type={{ type_filter }}&{% endif %}page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?{% if type_filter %}type={{ type_filter }}&{% endif %}page={{ page_obj.next_page_number }}"><i class="bi bi-chevron-right"></i></a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

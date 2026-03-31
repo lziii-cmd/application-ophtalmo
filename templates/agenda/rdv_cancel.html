@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Annuler RDV - OphtalmoClinique{% endblock %}
+{% block page_title %}<i class="bi bi-x-circle me-2"></i>Annuler un rendez-vous{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm border-danger">
+            <div class="card-header bg-danger-subtle">
+                <h6 class="mb-0 fw-semibold text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Confirmation d'annulation</h6>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-light border mb-3">
+                    <strong>{{ rdv.patient.nom_complet }}</strong><br>
+                    <span class="text-muted">{{ rdv.date_heure|date:"l d/m/Y à H:i"|capfirst }} — Dr {{ rdv.medecin.get_full_name }}</span>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Motif d'annulation <span class="text-danger">*</span></label>
+                        <textarea name="motif_annulation" class="form-control" rows="3" required
+                                  placeholder="Indiquez la raison de l'annulation..."></textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-x-circle me-1"></i>Confirmer l'annulation
+                        </button>
+                        <a href="{% url 'agenda:rdv_detail' rdv.pk %}" class="btn btn-outline-secondary">Retour</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+
+{% block title %}Tableau de bord - OphtalmoClinique{% endblock %}
+{% block page_title %}<i class="bi bi-speedometer2 me-2"></i>Tableau de bord{% endblock %}
+
+{% block content %}
+
+<!-- Indicateurs selon le rôle -->
+{% if user.is_administrateur or user.is_superuser %}
+<!-- === ADMINISTRATEUR === -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm stat-card stat-card-primary">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-people-fill fs-4"></i></div>
+                <div>
+                    <div class="stat-value">{{ total_patients|default:"0" }}</div>
+                    <div class="stat-label">Patients total</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm stat-card stat-card-success">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-clipboard2-pulse-fill fs-4"></i></div>
+                <div>
+                    <div class="stat-value">{{ total_consultations|default:"0" }}</div>
+                    <div class="stat-label">Consultations total</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm stat-card stat-card-info">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-info-subtle text-info"><i class="bi bi-person-gear fs-4"></i></div>
+                <div>
+                    <div class="stat-value">{{ total_utilisateurs|default:"0" }}</div>
+                    <div class="stat-label">Utilisateurs actifs</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm stat-card {% if comptes_verrouillis > 0 %}stat-card-danger{% else %}stat-card-secondary{% endif %}">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon {% if comptes_verrouillis > 0 %}bg-danger-subtle text-danger{% else %}bg-secondary-subtle text-secondary{% endif %}">
+                    <i class="bi bi-lock-fill fs-4"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ comptes_verrouillis|default:"0" }}</div>
+                    <div class="stat-label">Comptes verrouillés</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ligne 2 admin -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm stat-card {% if nb_impayes > 0 %}stat-card-warning{% else %}stat-card-success{% endif %}">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon {% if nb_impayes > 0 %}bg-warning-subtle text-warning{% else %}bg-success-subtle text-success{% endif %}">
+                    <i class="bi bi-cash-coin fs-4"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ nb_impayes|default:"0" }}</div>
+                    <div class="stat-label">Impayés &gt;30j</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm stat-card {% if sauvegardes_echec > 0 %}stat-card-danger{% else %}stat-card-success{% endif %}">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon {% if sauvegardes_echec > 0 %}bg-danger-subtle text-danger{% else %}bg-success-subtle text-success{% endif %}">
+                    <i class="bi bi-database fs-4"></i>
+                </div>
+                <div>
+                    <div class="stat-value">
+                        {% if derniere_sauvegarde %}
+                            {{ derniere_sauvegarde.date_heure|date:"d/m" }}
+                        {% else %}Jamais{% endif %}
+                    </div>
+                    <div class="stat-label">Dernière sauvegarde</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm stat-card stat-card-primary">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-calendar3 fs-4"></i></div>
+                <div>
+                    <div class="stat-value">{{ rdv_aujourd_hui|length }}</div>
+                    <div class="stat-label">RDV aujourd'hui</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm stat-card stat-card-info">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-info-subtle text-info"><i class="bi bi-person-exclamation fs-4"></i></div>
+                <div>
+                    <div class="stat-value">{{ nb_patients_a_recontacter|default:"0" }}</div>
+                    <div class="stat-label">À recontacter</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif user.is_secretaire %}
+<!-- === SECRÉTAIRE === -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm stat-card stat-card-primary">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-people-fill fs-4"></i></div>
+                <div>
+                    <div class="stat-value">{{ patients_actifs_count|default:"0" }}</div>
+                    <div class="stat-label">Patients actifs</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm stat-card stat-card-success">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-calendar-check fs-4"></i></div>
+                <div>
+                    <div class="stat-value">{{ rdv_jour_total|default:"0" }}</div>
+                    <div class="stat-label">RDV aujourd'hui</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm stat-card stat-card-info">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-info-subtle text-info"><i class="bi bi-cash-stack fs-4"></i></div>
+                <div>
+                    <div class="stat-value">{{ encaissement_jour|default:"0" }}€</div>
+                    <div class="stat-label">Encaissé aujourd'hui</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm stat-card {% if nb_impayes > 0 %}stat-card-warning{% else %}stat-card-secondary{% endif %}">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon {% if nb_impayes > 0 %}bg-warning-subtle text-warning{% else %}bg-secondary-subtle text-secondary{% endif %}">
+                    <i class="bi bi-exclamation-triangle fs-4"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ nb_impayes|default:"0" }}</div>
+                    <div class="stat-label">Impayés &gt;30j</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif user.is_medecin %}
+<!-- === MÉDECIN === -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm stat-card stat-card-primary">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-calendar-event fs-4"></i></div>
+                <div>
+                    <div class="stat-value">
+                        {% if prochain_rdv %}{{ prochain_rdv.date_heure|date:"H:i" }}{% else %}—{% endif %}
+                    </div>
+                    <div class="stat-label">Prochain RDV</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm stat-card stat-card-success">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-clipboard2-pulse fs-4"></i></div>
+                <div>
+                    <div class="stat-value">{{ consultations_jour|default:"0" }}</div>
+                    <div class="stat-label">Consultations du jour</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm stat-card stat-card-warning">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-person-exclamation fs-4"></i></div>
+                <div>
+                    <div class="stat-value">{{ nb_patients_a_recontacter|default:"0" }}</div>
+                    <div class="stat-label">À recontacter</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm stat-card stat-card-info">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-info-subtle text-info"><i class="bi bi-calendar3 fs-4"></i></div>
+                <div>
+                    <div class="stat-value">{{ rdv_jour|default:"0" }}</div>
+                    <div class="stat-label">RDV du jour</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- RDV d'aujourd'hui + Raccourcis -->
+<div class="row g-3">
+    <!-- RDV du jour -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-calendar-day me-2 text-primary"></i>Rendez-vous d'aujourd'hui</h6>
+                <a href="{% url 'agenda:calendar' %}" class="btn btn-sm btn-outline-primary">Voir l'agenda</a>
+            </div>
+            <div class="card-body p-0">
+                {% if rdv_aujourd_hui %}
+                <div class="list-group list-group-flush">
+                    {% for rdv in rdv_aujourd_hui %}
+                    <a href="{% url 'agenda:rdv_detail' rdv.pk %}" class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3 px-4">
+                        <div class="text-center" style="min-width:50px;">
+                            <div class="fw-bold text-primary">{{ rdv.date_heure|date:"H:i" }}</div>
+                            <small class="text-muted">{{ rdv.duree }}min</small>
+                        </div>
+                        <div class="vr"></div>
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold">{{ rdv.patient.nom_complet }}</div>
+                            <small class="text-muted">
+                                <i class="bi bi-person-badge me-1"></i>Dr {{ rdv.medecin.get_full_name }}
+                                {% if rdv.motif %} — {{ rdv.motif }}{% endif %}
+                            </small>
+                        </div>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">{{ rdv.get_statut_display }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-calendar-x display-5 d-block mb-2 opacity-25"></i>
+                    <p class="mb-0">Aucun rendez-vous aujourd'hui</p>
+                    <a href="{% url 'agenda:rdv_create' %}" class="btn btn-sm btn-primary mt-2">
+                        <i class="bi bi-plus me-1"></i>Créer un RDV
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Raccourcis + Alertes -->
+    <div class="col-lg-5">
+        <!-- Actions rapides -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-lightning-fill me-2 text-warning"></i>Actions rapides</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    {% if user.is_secretaire or user.is_administrateur or user.is_superuser %}
+                    <a href="{% url 'agenda:rdv_create' %}" class="btn btn-outline-primary btn-sm text-start">
+                        <i class="bi bi-calendar-plus me-2"></i>Nouveau rendez-vous
+                    </a>
+                    <a href="{% url 'patients:create' %}" class="btn btn-outline-success btn-sm text-start">
+                        <i class="bi bi-person-plus me-2"></i>Nouveau patient
+                    </a>
+                    <a href="{% url 'paiements:create' %}" class="btn btn-outline-info btn-sm text-start">
+                        <i class="bi bi-cash-coin me-2"></i>Enregistrer un paiement
+                    </a>
+                    {% endif %}
+                    {% if user.is_medecin or user.is_administrateur or user.is_superuser %}
+                    <a href="{% url 'consultations:create' %}" class="btn btn-outline-primary btn-sm text-start">
+                        <i class="bi bi-clipboard2-plus me-2"></i>Nouvelle consultation
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'patients:list' %}" class="btn btn-outline-secondary btn-sm text-start">
+                        <i class="bi bi-search me-2"></i>Rechercher un patient
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patients à recontacter (médecin/admin) -->
+        {% if patients_a_recontacter_liste %}
+        <div class="card border-0 shadow-sm border-warning">
+            <div class="card-header bg-warning-subtle border-warning">
+                <h6 class="mb-0 fw-semibold text-warning-emphasis">
+                    <i class="bi bi-person-exclamation me-2"></i>Patients à recontacter
+                </h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for p in patients_a_recontacter_liste %}
+                    <a href="{% url 'patients:detail' p.pk %}" class="list-group-item list-group-item-action py-2 px-3">
+                        <div class="fw-semibold small">{{ p.nom_complet }}</div>
+                        <small class="text-muted">
+                            {% if p.jours_depuis_derniere_consultation %}
+                                Dernière consultation: il y a {{ p.jours_depuis_derniere_consultation }} jours
+                            {% else %}
+                                Jamais consulté
+                            {% endif %}
+                        </small>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% if nb_patients_a_recontacter > 5 %}
+            <div class="card-footer bg-white text-center">
+                <small class="text-muted">Et {{ nb_patients_a_recontacter|add:"-5" }} autres...</small>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

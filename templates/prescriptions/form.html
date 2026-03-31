@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+
+{% block title %}Nouvelle prescription - OphtalmoClinique{% endblock %}
+{% block page_title %}<i class="bi bi-file-medical me-2"></i>Nouvelle prescription — {{ type_label }}{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'consultations:detail' consultation.pk %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left me-1"></i>Retour à la consultation
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <!-- Sélection du type -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body py-2">
+                <div class="d-flex gap-2 flex-wrap align-items-center">
+                    <span class="fw-semibold text-muted small">Type:</span>
+                    {% for key, label in type_labels.items %}
+                    <a href="?type={{ key }}" class="btn btn-sm {% if type_prescription == key %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                        {% if key == 'lunettes' %}<i class="bi bi-eyeglasses me-1"></i>
+                        {% elif key == 'traitement' %}<i class="bi bi-capsule me-1"></i>
+                        {% elif key == 'examen' %}<i class="bi bi-clipboard2-data me-1"></i>
+                        {% elif key == 'lentilles' %}<i class="bi bi-circle me-1"></i>
+                        {% endif %}{{ label }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Info patient/consultation -->
+        <div class="card border-0 shadow-sm mb-3 bg-light">
+            <div class="card-body py-2">
+                <div class="d-flex align-items-center gap-3">
+                    <div>
+                        <span class="text-muted small">Patient:</span>
+                        <strong class="ms-1">{{ consultation.patient.nom_complet }}</strong>
+                    </div>
+                    <div class="vr"></div>
+                    <div>
+                        <span class="text-muted small">Consultation:</span>
+                        <strong class="ms-1">{{ consultation.date_heure|date:"d/m/Y" }}</strong>
+                    </div>
+                    <div class="vr"></div>
+                    <div>
+                        <span class="text-muted small">Médecin:</span>
+                        <strong class="ms-1">Dr {{ consultation.medecin.get_full_name }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulaire -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-semibold">
+                    {% if type_prescription == 'lunettes' %}<i class="bi bi-eyeglasses me-2 text-primary"></i>Correction optique
+                    {% elif type_prescription == 'traitement' %}<i class="bi bi-capsule me-2 text-success"></i>Médicaments prescrits
+                    {% elif type_prescription == 'examen' %}<i class="bi bi-clipboard2-data me-2 text-info"></i>Examens complémentaires
+                    {% elif type_prescription == 'lentilles' %}<i class="bi bi-circle me-2 text-warning"></i>Lentilles de contact
+                    {% endif %}
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <input type="hidden" name="type_prescription" value="{{ type_prescription }}">
+
+                    {% if type_prescription == 'lunettes' %}
+                    <!-- Formulaire lunettes -->
+                    <div class="table-responsive mb-3">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th></th>
+                                    <th>Sphère</th>
+                                    <th>Cylindre</th>
+                                    <th>Axe</th>
+                                    <th>Addition</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>Oeil droit (OD)</th>
+                                    <td>{{ form.od_sphere }}</td>
+                                    <td>{{ form.od_cylindre }}</td>
+                                    <td>{{ form.od_axe }}</td>
+                                    <td>{{ form.od_addition }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Oeil gauche (OG)</th>
+                                    <td>{{ form.og_sphere }}</td>
+                                    <td>{{ form.og_cylindre }}</td>
+                                    <td>{{ form.og_axe }}</td>
+                                    <td>{{ form.og_addition }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">{{ form.remarques.label }}</label>
+                        {{ form.remarques }}
+                    </div>
+
+                    {% elif type_prescription == 'traitement' %}
+                    <!-- Formulaire traitement -->
+                    {% for i in "123" %}
+                    {% with idx=forloop.counter %}
+                    <div class="card border mb-3">
+                        <div class="card-header bg-light py-2">
+                            <h6 class="mb-0 small fw-semibold">Médicament {{ idx }}</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-semibold">Nom du médicament</label>
+                                    {% if idx == 1 %}{{ form.medicament_1_nom }}{% elif idx == 2 %}{{ form.medicament_2_nom }}{% else %}{{ form.medicament_3_nom }}{% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-semibold">Posologie</label>
+                                    {% if idx == 1 %}{{ form.medicament_1_posologie }}{% elif idx == 2 %}{{ form.medicament_2_posologie }}{% else %}{{ form.medicament_3_posologie }}{% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-semibold">Durée</label>
+                                    {% if idx == 1 %}{{ form.medicament_1_duree }}{% elif idx == 2 %}{{ form.medicament_2_duree }}{% else %}{{ form.medicament_3_duree }}{% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-semibold">Instructions</label>
+                                    {% if idx == 1 %}{{ form.medicament_1_instructions }}{% elif idx == 2 %}{{ form.medicament_2_instructions }}{% else %}{{ form.medicament_3_instructions }}{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endwith %}
+                    {% endfor %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">{{ form.remarques.label }}</label>
+                        {{ form.remarques }}
+                    </div>
+
+                    {% elif type_prescription == 'examen' %}
+                    <!-- Formulaire examens -->
+                    {% for i in "123" %}
+                    {% with idx=forloop.counter %}
+                    <div class="card border mb-3">
+                        <div class="card-header bg-light py-2">
+                            <h6 class="mb-0 small fw-semibold">Examen {{ idx }}</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class="col-md-5">
+                                    <label class="form-label small fw-semibold">Nom de l'examen</label>
+                                    {% if idx == 1 %}{{ form.examen_1_nom }}{% elif idx == 2 %}{{ form.examen_2_nom }}{% else %}{{ form.examen_3_nom }}{% endif %}
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label small fw-semibold">Indication</label>
+                                    {% if idx == 1 %}{{ form.examen_1_indication }}{% elif idx == 2 %}{{ form.examen_2_indication }}{% else %}{{ form.examen_3_indication }}{% endif %}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label small fw-semibold">Urgence</label>
+                                    {% if idx == 1 %}{{ form.examen_1_urgence }}{% elif idx == 2 %}{{ form.examen_2_urgence }}{% else %}{{ form.examen_3_urgence }}{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endwith %}
+                    {% endfor %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">{{ form.remarques.label }}</label>
+                        {{ form.remarques }}
+                    </div>
+
+                    {% elif type_prescription == 'lentilles' %}
+                    <!-- Formulaire lentilles -->
+                    <div class="table-responsive mb-3">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th></th>
+                                    <th>Rayon</th>
+                                    <th>Diamètre</th>
+                                    <th>Puissance</th>
+                                    <th>Marque</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>Oeil droit (OD)</th>
+                                    <td>{{ form.od_rayon }}</td>
+                                    <td>{{ form.od_diametre }}</td>
+                                    <td>{{ form.od_puissance }}</td>
+                                    <td>{{ form.od_marque }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Oeil gauche (OG)</th>
+                                    <td>{{ form.og_rayon }}</td>
+                                    <td>{{ form.og_diametre }}</td>
+                                    <td>{{ form.og_puissance }}</td>
+                                    <td>{{ form.og_marque }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">{{ form.renouvellement.label }}</label>
+                            {{ form.renouvellement }}
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold">{{ form.remarques.label }}</label>
+                            {{ form.remarques }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex gap-2 mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>Créer la prescription
+                        </button>
+                        <a href="{% url 'consultations:detail' consultation.pk %}" class="btn btn-outline-secondary">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

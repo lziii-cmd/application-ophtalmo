@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Utilisateurs - OphtalmoClinique{% endblock %}
+{% block page_title %}<i class="bi bi-people-fill me-2"></i>Gestion des utilisateurs{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'accounts:user_create' %}" class="btn btn-primary btn-sm">
+    <i class="bi bi-person-plus me-1"></i>Nouvel utilisateur
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Utilisateur</th>
+                        <th>Rôle</th>
+                        <th>Email</th>
+                        <th>RPPS</th>
+                        <th>Statut</th>
+                        <th>Sécurité</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="avatar-circle avatar-circle-sm">
+                                    {{ u.first_name|first|default:u.username|first|upper }}
+                                </div>
+                                <div>
+                                    <div class="fw-semibold">{{ u.get_full_name|default:u.username }}</div>
+                                    <small class="text-muted">@{{ u.username }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge {% if u.role == 'medecin' %}bg-primary{% elif u.role == 'administrateur' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                {{ u.get_role_display }}
+                            </span>
+                        </td>
+                        <td>{{ u.email|default:"—" }}</td>
+                        <td>{{ u.rpps|default:"—" }}</td>
+                        <td>
+                            {% if u.is_active %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">Actif</span>
+                            {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Inactif</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if u.is_locked %}
+                            <span class="badge bg-danger">
+                                <i class="bi bi-lock-fill me-1"></i>Verrouillé
+                            </span>
+                            {% elif u.failed_login_count > 0 %}
+                            <span class="badge bg-warning text-dark">
+                                <i class="bi bi-exclamation-triangle me-1"></i>{{ u.failed_login_count }} échec(s)
+                            </span>
+                            {% else %}
+                            <span class="badge bg-light text-muted border">Normal</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'accounts:user_edit' u.pk %}" class="btn btn-outline-primary" title="Modifier">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                {% if u.is_locked %}
+                                <a href="{% url 'accounts:user_unlock' u.pk %}" class="btn btn-outline-success" title="Déverrouiller"
+                                   onclick="return confirm('Déverrouiller le compte de {{ u.get_full_name }}?')">
+                                    <i class="bi bi-unlock"></i>
+                                </a>
+                                {% endif %}
+                                {% if u != request.user %}
+                                <a href="{% url 'accounts:user_toggle_active' u.pk %}" class="btn btn-outline-{% if u.is_active %}warning{% else %}success{% endif %}"
+                                   title="{% if u.is_active %}Désactiver{% else %}Activer{% endif %}"
+                                   onclick="return confirm('{% if u.is_active %}Désactiver{% else %}Activer{% endif %} le compte de {{ u.get_full_name }}?')">
+                                    <i class="bi bi-{% if u.is_active %}person-dash{% else %}person-check{% endif %}"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-people display-4 d-block mb-2"></i>
+                            Aucun utilisateur trouvé.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

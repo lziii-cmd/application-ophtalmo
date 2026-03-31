@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}Patients - OphtalmoClinique{% endblock %}
+{% block page_title %}<i class="bi bi-people me-2"></i>Patients{% endblock %}
+
+{% block header_actions %}
+{% if user.is_secretaire or user.is_administrateur or user.is_superuser %}
+<a href="{% url 'patients:create' %}" class="btn btn-primary btn-sm">
+    <i class="bi bi-person-plus me-1"></i>Nouveau patient
+</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<!-- Formulaire de recherche -->
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-6 col-lg-5">
+                <label class="form-label fw-semibold small">Recherche</label>
+                {{ form.q }}
+            </div>
+            <div class="col-md-3 col-lg-2">
+                <label class="form-label fw-semibold small">Statut</label>
+                {{ form.statut }}
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search me-1"></i>Rechercher
+                </button>
+            </div>
+            {% if request.GET.q or request.GET.statut %}
+            <div class="col-auto">
+                <a href="{% url 'patients:list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-lg me-1"></i>Réinitialiser
+                </a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<!-- Résultats -->
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <span class="fw-semibold text-muted small">
+            {{ page_obj.paginator.count }} patient(s) trouvé(s)
+        </span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>N°</th>
+                        <th>Patient</th>
+                        <th>Date de naissance</th>
+                        <th>Téléphone</th>
+                        <th>Statut</th>
+                        <th>Allergies</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for patient in page_obj %}
+                    <tr data-href="{% url 'patients:detail' patient.pk %}"
+                        <td><small class="text-muted font-monospace">{{ patient.pk|stringformat:"06d" }}</small></td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="avatar-circle avatar-circle-sm bg-primary text-white">
+                                    {{ patient.nom|first }}
+                                </div>
+                                <div>
+                                    <a href="{% url 'patients:detail' patient.pk %}" class="fw-semibold text-decoration-none text-dark">
+                                        {{ patient.nom_complet }}
+                                    </a>
+                                    <div class="text-muted small">{{ patient.get_sexe_display }} — {{ patient.age }} ans</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ patient.date_naissance|date:"d/m/Y" }}</td>
+                        <td>{{ patient.telephone }}</td>
+                        <td>
+                            {% if patient.statut == 'actif' %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">Actif</span>
+                            {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Archivé</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if patient.has_allergies %}
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle" title="{{ patient.allergies }}">
+                                <i class="bi bi-exclamation-triangle me-1"></i>Allergies
+                            </span>
+                            {% else %}
+                            <span class="text-muted small">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'patients:detail' patient.pk %}" class="btn btn-outline-primary" title="Voir le dossier">
+                                    <i class="bi bi-folder2-open"></i>
+                                </a>
+                                {% if user.is_secretaire or user.is_administrateur or user.is_superuser %}
+                                <a href="{% url 'patients:edit' patient.pk %}" class="btn btn-outline-secondary" title="Modifier">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                {% endif %}
+                                {% if user.is_medecin or user.is_administrateur or user.is_superuser %}
+                                <a href="{% url 'agenda:rdv_create' %}?patient={{ patient.pk }}" class="btn btn-outline-success" title="Nouveau RDV">
+                                    <i class="bi bi-calendar-plus"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-people display-4 d-block mb-2 opacity-25"></i>
+                            <p class="mb-1">Aucun patient trouvé.</p>
+                            {% if user.is_secretaire or user.is_administrateur or user.is_superuser %}
+                            <a href="{% url 'patients:create' %}" class="btn btn-sm btn-primary mt-1">
+                                <i class="bi bi-person-plus me-1"></i>Créer le premier patient
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="card-footer bg-white">
+        <nav>
+            <ul class="pagination pagination-sm mb-0 justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.statut %}statut={{ request.GET.statut }}&{% endif %}page={{ page_obj.previous_page_number }}">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.statut %}statut={{ request.GET.statut }}&{% endif %}page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.statut %}statut={{ request.GET.statut }}&{% endif %}page={{ page_obj.next_page_number }}">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
