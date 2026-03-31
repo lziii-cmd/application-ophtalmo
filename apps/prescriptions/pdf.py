@@ -116,35 +116,37 @@ def build_header(story, medecin, styles):
     telephone = getattr(medecin, 'telephone', '') or ''
     email = getattr(medecin, 'email', '') or ''
 
-    style_right = ParagraphStyle('Right', parent=styles['Normal'], alignment=TA_RIGHT, fontSize=10)
+    style_right = ParagraphStyle('Right', parent=styles['Normal'], alignment=TA_RIGHT,
+                                  fontSize=10, fontName='Helvetica-Bold')
     style_right_sm = ParagraphStyle('RightSm', parent=styles['Normal'], alignment=TA_RIGHT,
                                     fontSize=9, textColor=colors.HexColor('#6c757d'))
 
-    left_col = [
+    # Colonne gauche : médecin
+    left_lines = [
         Paragraph(f"Dr {medecin_name}", styles['ClinicHeader']),
         Paragraph(specialite, styles['ClinicSubHeader']),
     ]
     if rpps:
-        left_col.append(Paragraph(f"RPPS : {rpps}", styles['ClinicSubHeader']))
-    if telephone:
-        left_col.append(Paragraph(f"Tel : {telephone}", styles['ClinicSubHeader']))
+        left_lines.append(Paragraph(f"RPPS : {rpps}", styles['ClinicSubHeader']))
 
-    right_col = [
-        Paragraph("<b>Cabinet d'Ophtalmologie</b>", style_right),
+    # Colonne droite : cabinet (sans téléphone dupliqué)
+    right_lines = [
+        Paragraph("Cabinet d'Ophtalmologie", style_right),
         Paragraph("Dakar, Senegal", style_right_sm),
-        Paragraph(f"Tel : {telephone}", style_right_sm) if telephone else Paragraph('', styles['Normal']),
-        Paragraph(f"{email}", style_right_sm) if email else Paragraph('', styles['Normal']),
     ]
+    if telephone:
+        right_lines.append(Paragraph(f"Tel : {telephone}", style_right_sm))
+    if email:
+        right_lines.append(Paragraph(email, style_right_sm))
 
-    # Construire en tableau 2 colonnes
     rows = []
-    max_rows = max(len(left_col), len(right_col))
+    max_rows = max(len(left_lines), len(right_lines))
     for i in range(max_rows):
-        l = left_col[i] if i < len(left_col) else Paragraph('', styles['Normal'])
-        r = right_col[i] if i < len(right_col) else Paragraph('', styles['Normal'])
+        l = left_lines[i] if i < len(left_lines) else Paragraph('', styles['Normal'])
+        r = right_lines[i] if i < len(right_lines) else Paragraph('', styles['Normal'])
         rows.append([l, r])
 
-    header_table = Table(rows, colWidths=[10*cm, 9*cm])
+    header_table = Table(rows, colWidths=[9*cm, 8*cm])
     header_table.setStyle(TableStyle([
         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
         ('TOPPADDING', (0, 0), (-1, -1), 2),
@@ -201,12 +203,13 @@ def generate_prescription_pdf(prescription):
     qr_img = make_qr_image(qr_data)
 
     def on_first_page(canvas, doc):
-        """Dessine le QR code en haut à droite sur la première page."""
+        """Dessine le QR code en bas à droite (marge inférieure) sur la première page."""
         if qr_img:
             page_width, page_height = A4
-            qr_size = 2.5 * cm
+            qr_size = 2.0 * cm
+            # Positionné dans la marge inférieure, à droite — ne chevauche pas le contenu
             x = page_width - doc.rightMargin - qr_size
-            y = page_height - doc.topMargin - qr_size
+            y = 0.4 * cm
             canvas.drawImage(qr_img, x, y, width=qr_size, height=qr_size, preserveAspectRatio=True)
 
     doc = SimpleDocTemplate(
