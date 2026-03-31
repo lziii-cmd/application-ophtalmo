@@ -546,24 +546,43 @@ body.dark-mode .content-header .text-dark {
 
 body.dark-mode .table {
     color: #e9ecef !important;
+    --bs-table-bg: #2d3238;
+    --bs-table-striped-bg: #32383f;
+    --bs-table-hover-bg: #3a4148;
+    --bs-table-border-color: #495057;
+    --bs-table-color: #e9ecef;
+}
+
+body.dark-mode .table td,
+body.dark-mode .table tr {
+    background-color: #2d3238 !important;
+    border-color: #3d444b !important;
+    color: #e9ecef !important;
 }
 
 body.dark-mode .table th {
     color: #adb5bd !important;
+    background-color: #343a40 !important;
+    border-color: #495057 !important;
 }
 
 body.dark-mode .table-light,
-body.dark-mode thead.table-light {
+body.dark-mode thead.table-light,
+body.dark-mode thead.table-light tr,
+body.dark-mode thead.table-light th {
     background-color: #343a40 !important;
+    color: #adb5bd !important;
+    border-color: #495057 !important;
+}
+
+body.dark-mode .table-hover tbody tr:hover,
+body.dark-mode .table-hover tbody tr:hover td {
+    background-color: #3a4148 !important;
     color: #e9ecef !important;
 }
 
-body.dark-mode .table-hover tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    color: #e9ecef !important;
-}
-
-body.dark-mode .table tbody tr.clickable-row:hover {
+body.dark-mode .table tbody tr[data-href]:hover,
+body.dark-mode .table tbody tr[data-href]:hover td {
     background-color: rgba(13, 110, 253, 0.15) !important;
 }
 
@@ -709,6 +728,15 @@ body.dark-mode .text-secondary { color: #9aa3ac !important; }
 body.dark-mode .border-secondary-subtle { border-color: #3a4148 !important; }
 
 body.dark-mode .bg-light { background-color: #2d3238 !important; color: #e9ecef !important; }
+
+/* --- Tous les boutons outline — règle générale --- */
+body.dark-mode [class*="btn-outline-"] {
+    background-color: transparent !important;
+}
+body.dark-mode .btn-group .btn,
+body.dark-mode .btn-group-sm .btn {
+    background-color: transparent !important;
+}
 
 /* --- Boutons outline en dark mode --- */
 body.dark-mode .btn-outline-primary {
