@@ -14,7 +14,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-ophtalmo-dev-key-chan
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1', 'eabn.ink', 'www.eabn.ink').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,eabn.ink,www.eabn.ink').split(',')
 
 CSRF_TRUSTED_ORIGINS = [
     f"https://{host}" for host in os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')

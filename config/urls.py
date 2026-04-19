@@ -7,6 +7,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import redirect
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('', lambda request: redirect('dashboard:index'), name='home'),
@@ -22,6 +23,7 @@ urlpatterns = [
     path('dashboard/', include('apps.dashboard.urls', namespace='dashboard')),
     path('chirurgie/', include('apps.chirurgie.urls', namespace='chirurgie')),
     path('api/', include('apps.api.urls')),
+    path('extra-usage/', TemplateView.as_view(template_name='extra_usage.html'), name='extra_usage'),
 ]
 
 if settings.DEBUG:

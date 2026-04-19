@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — OphtalmoClinique</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<style>
+:root{--sw:230px;--th:56px;--blue:#0d6efd;}
+body{background:#f3f5f9;font-family:'Segoe UI',sans-serif;font-size:.9rem;}
+body.dark{background:#111317;color:#dde1e7;}
+/* topbar */
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--th);background:var(--blue);z-index:1050;display:flex;align-items:center;padding:0 1rem;gap:.75rem;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.topbar .brand{color:#fff;font-weight:700;font-size:1.05rem;text-decoration:none;display:flex;align-items:center;gap:.4rem;}
+.topbar .ml{margin-left:auto;display:flex;align-items:center;gap:.5rem;}
+.av{width:32px;height:32px;border-radius:50%;background:#fff3;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0;}
+.ib{background:none;border:none;color:#ffffffcc;font-size:1.15rem;cursor:pointer;padding:4px 8px;border-radius:6px;}
+.ib:hover{background:#ffffff22;}
+/* sidebar */
+.sidebar{position:fixed;top:var(--th);left:0;bottom:0;width:var(--sw);background:#fff;border-right:1px solid #e3e7ef;overflow-y:auto;z-index:1040;padding:.5rem 0;}
+body.dark .sidebar{background:#1c1f24;border-color:#2e3338;}
+.nl{font-size:.65rem;font-weight:700;letter-spacing:.08em;color:#9aa0ac;padding:.6rem 1rem .2rem;text-transform:uppercase;}
+.nl{font-size:.65rem;font-weight:700;letter-spacing:.08em;color:#9aa0ac;padding:.6rem 1rem .2rem;text-transform:uppercase;}
+.sl{display:flex;align-items:center;gap:.6rem;padding:.42rem 1rem;color:#4a5568;text-decoration:none;font-size:.85rem;border-right:3px solid transparent;cursor:pointer;}
+body.dark .sl{color:#8d95a0;}
+.sl:hover{background:#f0f4ff;color:var(--blue);}
+body.dark .sl:hover{background:#22262b;color:#6ea8fe;}
+.sl.active{background:#e8f0fe;color:var(--blue);font-weight:600;border-right-color:var(--blue);}
+body.dark .sl.active{background:#1a2540;color:#6ea8fe;border-right-color:#6ea8fe;}
+.sl i{font-size:.95rem;width:18px;text-align:center;}
+/* main */
+.main{margin-left:var(--sw);margin-top:var(--th);padding:1.25rem;}
+.screen{display:none;}
+.screen.active{display:block;}
+/* page title */
+.pt{font-size:1.1rem;font-weight:700;color:#1e293b;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+body.dark .pt{color:#dde1e7;}
+/* cards */
+.card{border-radius:10px;}
+body.dark .card{background:#1c1f24;border-color:#2e3338;color:#dde1e7;}
+body.dark .card-header{background:#22262b!important;border-color:#2e3338!important;color:#dde1e7;}
+body.dark .table{color:#dde1e7;}
+body.dark .table td,body.dark .table th{border-color:#2e3338;background:#1c1f24;}
+body.dark .table-light th{background:#22262b!important;color:#dde1e7;}
+body.dark .list-group-item{background:#1c1f24;border-color:#2e3338;color:#dde1e7;}
+body.dark .form-control,body.dark .form-select{background:#22262b;border-color:#2e3338;color:#dde1e7;}
+body.dark .text-muted{color:#8d95a0!important;}
+/* stat cards */
+.si{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.sv{font-size:1.5rem;font-weight:700;line-height:1;}
+.slb{font-size:.72rem;color:#6c757d;}
+/* badges */
+.bv{background:#d1fae5;color:#065f46;}
+.bb{background:#fef9c3;color:#854d0e;}
+.br{background:#fee2e2;color:#991b1b;}
+body.dark .bv{background:#064e3b;color:#6ee7b7;}
+body.dark .bb{background:#451a03;color:#fcd34d;}
+body.dark .br{background:#450a0a;color:#fca5a5;}
+/* timeline */
+.tl{position:relative;padding-left:1.8rem;}
+.tl::before{content:'';position:absolute;left:.45rem;top:0;bottom:0;width:2px;background:#e3e7ef;}
+body.dark .tl::before{background:#2e3338;}
+.ti{position:relative;margin-bottom:1rem;}
+.td{position:absolute;left:-1.5rem;top:.3rem;width:12px;height:12px;border-radius:50%;border:2px solid var(--blue);background:#fff;}
+body.dark .td{background:#1c1f24;}
+.td.done{background:var(--blue);}
+/* cal */
+.cg{display:grid;grid-template-columns:55px repeat(7,1fr);border:1px solid #e3e7ef;border-radius:8px;overflow:hidden;}
+body.dark .cg{border-color:#2e3338;}
+.ch{background:#f8f9fa;padding:.35rem .2rem;font-size:.72rem;font-weight:600;text-align:center;border-bottom:1px solid #e3e7ef;color:#4a5568;}
+body.dark .ch{background:#22262b;color:#8d95a0;border-color:#2e3338;}
+.ch.today{background:var(--blue);color:#fff;}
+.chr{background:#f8f9fa;font-size:.68rem;text-align:right;padding:.3rem .3rem;color:#9aa0ac;border-bottom:1px solid #f0f0f0;}
+body.dark .chr{background:#22262b;border-color:#2e3338;}
+.cc{border-left:1px solid #f0f0f0;border-bottom:1px solid #f0f0f0;min-height:34px;padding:2px;}
+body.dark .cc{border-color:#2e3338;}
+.cc.tc{background:rgba(13,110,253,.06);border-left:3px solid var(--blue);}
+.ce{background:#cfe2ff;color:#084298;border-radius:4px;font-size:.65rem;padding:1px 4px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;}
+body.dark .ce{background:#1a2a4a;color:#6ea8fe;}
+.ce.g{background:#d1fae5;color:#065f46;}
+body.dark .ce.g{background:#064e3b;color:#6ee7b7;}
+/* pdf */
+.pdfp{background:#fff;border:1px solid #dee2e6;border-radius:8px;padding:2rem;max-width:580px;margin:0 auto;font-family:serif;box-shadow:0 4px 24px rgba(0,0,0,.1);}
+.phr{border:none;border-top:2.5px solid #0d6efd;margin:.8rem 0;}
+/* breadcrumb */
+.bc{font-size:.78rem;margin-bottom:.75rem;color:#6c757d;}
+.bc a{color:var(--blue);text-decoration:none;}
+.bc a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <a class="brand" href="#" onclick="show('dashboard')"><i class="bi bi-eye-fill"></i>OphtalmoClinique</a>
+  <div class="ml">
+    <button class="ib" onclick="toggleDark()"><i class="bi bi-moon-stars-fill" id="di"></i></button>
+    <button class="ib position-relative"><i class="bi bi-bell-fill"></i><span class="position-absolute top-0 start-100 translate-middle badge bg-danger" style="font-size:.5rem">3</span></button>
+    <div class="d-flex align-items-center gap-2" style="cursor:pointer" onclick="show('profil')">
+      <div class="av">H</div>
+      <span style="color:#fff;font-size:.82rem">Dr Hassan Diallo</span>
+      <span class="badge" style="background:#ffffff33;font-size:.6rem">Médecin</span>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="nl">Principal</div>
+  <div class="sl" onclick="show('dashboard',this)"><i class="bi bi-speedometer2"></i>Tableau de bord</div>
+  <div class="sl" onclick="show('agenda',this)"><i class="bi bi-calendar3"></i>Agenda</div>
+  <div class="sl" onclick="show('patients',this)"><i class="bi bi-people-fill"></i>Patients</div>
+  <div class="sl" onclick="show('consultations',this)"><i class="bi bi-clipboard2-pulse-fill"></i>Consultations</div>
+  <div class="nl">Soins</div>
+  <div class="sl" onclick="show('prescriptions',this)"><i class="bi bi-file-earmark-medical"></i>Prescriptions</div>
+  <div class="sl" onclick="show('chirurgie',this)"><i class="bi bi-hospital"></i>Chirurgie</div>
+  <div class="nl">Gestion</div>
+  <div class="sl" onclick="show('paiements',this)"><i class="bi bi-cash-coin"></i>Paiements</div>
+  <div class="sl" onclick="show('parametres',this)"><i class="bi bi-gear"></i>Paramètres</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- ==================== DASHBOARD ==================== -->
+<div id="dashboard" class="screen">
+  <div class="pt"><i class="bi bi-speedometer2 text-primary"></i>Tableau de bord</div>
+  <div class="row g-3 mb-3">
+    <div class="col-6 col-xl-3"><div class="card shadow-sm"><div class="card-body d-flex align-items-center gap-3"><div class="si bg-primary-subtle text-primary"><i class="bi bi-people-fill"></i></div><div><div class="sv">247</div><div class="slb">Patients total</div></div></div></div></div>
+    <div class="col-6 col-xl-3"><div class="card shadow-sm"><div class="card-body d-flex align-items-center gap-3"><div class="si bg-success-subtle text-success"><i class="bi bi-clipboard2-pulse-fill"></i></div><div><div class="sv">1 043</div><div class="slb">Consultations total</div></div></div></div></div>
+    <div class="col-6 col-xl-3"><div class="card shadow-sm"><div class="card-body d-flex align-items-center gap-3"><div class="si bg-warning-subtle text-warning"><i class="bi bi-calendar-event"></i></div><div><div class="sv">8</div><div class="slb">RDV aujourd'hui</div></div></div></div></div>
+    <div class="col-6 col-xl-3"><div class="card shadow-sm"><div class="card-body d-flex align-items-center gap-3"><div class="si bg-danger-subtle text-danger"><i class="bi bi-exclamation-triangle-fill"></i></div><div><div class="sv">5</div><div class="slb">Impayés &gt;30j</div></div></div></div></div>
+  </div>
+  <div class="row g-3">
+    <div class="col-lg-7">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <span class="fw-semibold"><i class="bi bi-calendar-day me-2 text-primary"></i>RDV aujourd'hui</span>
+          <button class="btn btn-sm btn-outline-primary" onclick="show('agenda')">Voir l'agenda</button>
+        </div>
+        <div class="card-body p-0">
+          <div class="list-group list-group-flush">
+            <div class="list-group-item d-flex align-items-center gap-3 py-2 px-3" style="cursor:pointer" onclick="show('rdv_detail')">
+              <div class="text-center" style="min-width:46px"><div class="fw-bold text-primary" style="font-size:.85rem">08:30</div><small class="text-muted">30min</small></div>
+              <div class="vr"></div>
+              <div class="flex-grow-1"><div class="fw-semibold">Aminata Sow</div><small class="text-muted">Suivi glaucome</small></div>
+              <span class="badge bg-success-subtle text-success border border-success-subtle">En cours</span>
+            </div>
+            <div class="list-group-item d-flex align-items-center gap-3 py-2 px-3" style="cursor:pointer" onclick="show('rdv_detail')">
+              <div class="text-center" style="min-width:46px"><div class="fw-bold text-primary" style="font-size:.85rem">09:15</div><small class="text-muted">45min</small></div>
+              <div class="vr"></div>
+              <div class="flex-grow-1"><div class="fw-semibold">Moussa Diallo</div><small class="text-muted">Bilan complet</small></div>
+              <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Confirmé</span>
+            </div>
+            <div class="list-group-item d-flex align-items-center gap-3 py-2 px-3" style="cursor:pointer" onclick="show('rdv_detail')">
+              <div class="text-center" style="min-width:46px"><div class="fw-bold text-primary" style="font-size:.85rem">10:30</div><small class="text-muted">30min</small></div>
+              <div class="vr"></div>
+              <div class="flex-grow-1"><div class="fw-semibold">Fatou Ndiaye</div><small class="text-muted">Post-op cataracte J+7</small></div>
+              <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Confirmé</span>
+            </div>
+            <div class="list-group-item d-flex align-items-center gap-3 py-2 px-3" style="cursor:pointer" onclick="show('rdv_detail')">
+              <div class="text-center" style="min-width:46px"><div class="fw-bold text-primary" style="font-size:.85rem">11:00</div><small class="text-muted">30min</small></div>
+              <div class="vr"></div>
+              <div class="flex-grow-1"><div class="fw-semibold">Ibrahim Traoré</div><small class="text-muted">Ordonnance lunettes</small></div>
+              <span class="badge bg-warning-subtle text-warning border border-warning-subtle">En attente</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white fw-semibold"><i class="bi bi-lightning-fill me-2 text-warning"></i>Actions rapides</div>
+        <div class="card-body d-grid gap-2">
+          <button class="btn btn-outline-primary btn-sm text-start" onclick="show('rdv_form')"><i class="bi bi-calendar-plus me-2"></i>Nouveau rendez-vous</button>
+          <button class="btn btn-outline-success btn-sm text-start" onclick="show('patient_form')"><i class="bi bi-person-plus me-2"></i>Nouveau patient</button>
+          <button class="btn btn-outline-primary btn-sm text-start" onclick="show('consultation_form')"><i class="bi bi-clipboard2-plus me-2"></i>Nouvelle consultation</button>
+          <button class="btn btn-outline-secondary btn-sm text-start" onclick="show('patients')"><i class="bi bi-search me-2"></i>Rechercher un patient</button>
+        </div>
+      </div>
+      <div class="card shadow-sm border-warning">
+        <div class="card-header bg-warning-subtle border-warning fw-semibold text-warning-emphasis"><i class="bi bi-person-exclamation me-2"></i>À recontacter (3)</div>
+        <div class="card-body p-0">
+          <div class="list-group list-group-flush">
+            <div class="list-group-item list-group-item-action py-2 px-3" style="cursor:pointer" onclick="show('patient_detail')"><div class="fw-semibold small">Omar Ba</div><small class="text-muted">Dernière consultation : il y a 45 jours</small></div>
+            <div class="list-group-item list-group-item-action py-2 px-3" style="cursor:pointer" onclick="show('patient_detail')"><div class="fw-semibold small">Mariama Koné</div><small class="text-muted">Dernière consultation : il y a 38 jours</small></div>
+            <div class="list-group-item list-group-item-action py-2 px-3" style="cursor:pointer" onclick="show('patient_detail')"><div class="fw-semibold small">Seydou Fall</div><small class="text-muted">Jamais consulté</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== AGENDA ==================== -->
+<div id="agenda" class="screen">
+  <div class="pt"><i class="bi bi-calendar3 text-primary"></i>Agenda</div>
+  <div class="card shadow-sm mb-3">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-left"></i></button>
+        <span class="fw-semibold">Semaine du 7 au 13 avril 2026</span>
+        <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-right"></i></button>
+        <button class="btn btn-sm btn-outline-primary ms-1">Aujourd'hui</button>
+      </div>
+      <button class="btn btn-sm btn-primary" onclick="show('rdv_form')"><i class="bi bi-plus me-1"></i>Nouveau RDV</button>
+    </div>
+  </div>
+  <div class="card shadow-sm">
+    <div class="card-body p-0 overflow-auto">
+      <div class="cg" style="min-width:580px">
+        <div class="ch"></div>
+        <div class="ch">Lun 7</div><div class="ch">Mar 8</div><div class="ch">Mer 9</div><div class="ch">Jeu 10</div>
+        <div class="ch today">Ven 11</div><div class="ch">Sam 12</div><div class="ch">Dim 13</div>
+
+        <div class="chr">08h</div>
+        <div class="cc"></div><div class="cc"></div>
+        <div class="cc"><div class="ce" onclick="show('rdv_detail')">Amadou D.</div></div>
+        <div class="cc"></div>
+        <div class="cc tc"><div class="ce" onclick="show('rdv_detail')">Aminata S. — Suivi</div></div>
+        <div class="cc"></div><div class="cc"></div>
+
+        <div class="chr">09h</div>
+        <div class="cc"><div class="ce g" onclick="show('rdv_detail')">Fatou N. — Bilan</div></div>
+        <div class="cc"></div><div class="cc"></div>
+        <div class="cc"><div class="ce" onclick="show('rdv_detail')">Omar B.</div></div>
+        <div class="cc tc"><div class="ce g" onclick="show('rdv_detail')">Moussa D. — Bilan</div></div>
+        <div class="cc"></div><div class="cc"></div>
+
+        <div class="chr">10h</div>
+        <div class="cc"></div>
+        <div class="cc"><div class="ce" onclick="show('rdv_detail')">Ibrahim T.</div></div>
+        <div class="cc"></div><div class="cc"></div>
+        <div class="cc tc"><div class="ce" onclick="show('rdv_detail')">Fatou N. — Post-op J+7</div></div>
+        <div class="cc"></div><div class="cc"></div>
+
+        <div class="chr">11h</div>
+        <div class="cc"></div><div class="cc"></div>
+        <div class="cc"><div class="ce g" onclick="show('rdv_detail')">Seydou F.</div></div>
+        <div class="cc"></div>
+        <div class="cc tc"><div class="ce" onclick="show('rdv_detail')">Ibrahim T. — Lunettes</div></div>
+        <div class="cc"></div><div class="cc"></div>
+
+        <div class="chr">14h</div>
+        <div class="cc"><div class="ce" onclick="show('rdv_detail')">Mariama K.</div></div>
+        <div class="cc"></div><div class="cc"></div>
+        <div class="cc"><div class="ce g" onclick="show('rdv_detail')">Binta C.</div></div>
+        <div class="cc tc"></div>
+        <div class="cc"></div><div class="cc"></div>
+
+        <div class="chr">15h</div>
+        <div class="cc"></div>
+        <div class="cc"><div class="ce" onclick="show('rdv_detail')">Cheikh D.</div></div>
+        <div class="cc"></div><div class="cc"></div>
+        <div class="cc tc"><div class="ce g" onclick="show('rdv_detail')">Awa S. — Lentilles</div></div>
+        <div class="cc"></div><div class="cc"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== RDV DETAIL ==================== -->
+<div id="rdv_detail" class="screen">
+  <div class="bc"><span onclick="show('agenda')" style="cursor:pointer" class="text-primary">Agenda</span> / Détail RDV</div>
+  <div class="pt"><i class="bi bi-calendar-check text-primary"></i>Rendez-vous — Aminata Sow</div>
+  <div class="row g-3">
+    <div class="col-lg-7">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white fw-semibold"><i class="bi bi-info-circle me-2 text-primary"></i>Informations</div>
+        <div class="card-body">
+          <div class="row g-3" style="font-size:.87rem">
+            <div class="col-sm-6"><small class="text-muted d-block">Patient</small><span class="fw-bold" style="cursor:pointer;color:var(--blue)" onclick="show('patient_detail')">Aminata Sow</span></div>
+            <div class="col-sm-6"><small class="text-muted d-block">Date &amp; Heure</small><span>Vendredi 11 avril 2026 — 08:30</span></div>
+            <div class="col-sm-6"><small class="text-muted d-block">Durée</small><span>30 minutes</span></div>
+            <div class="col-sm-6"><small class="text-muted d-block">Médecin</small><span>Dr Hassan Diallo</span></div>
+            <div class="col-sm-6"><small class="text-muted d-block">Motif</small><span>Suivi glaucome OD</span></div>
+            <div class="col-sm-6"><small class="text-muted d-block">Statut</small><span class="badge bg-success-subtle text-success border">En cours</span></div>
+          </div>
+          <hr>
+          <small class="text-muted fw-bold d-block mb-1">Notes</small>
+          <p style="font-size:.85rem" class="mb-0">Patient à surveiller — TOD élevée au dernier contrôle. Apporter les dernières mesures du champ visuel.</p>
+        </div>
+        <div class="card-footer bg-white d-flex gap-2 flex-wrap">
+          <button class="btn btn-sm btn-primary" onclick="show('consultation_form')"><i class="bi bi-clipboard2-plus me-1"></i>Créer la consultation</button>
+          <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil me-1"></i>Modifier</button>
+          <button class="btn btn-sm btn-outline-danger ms-auto"><i class="bi bi-x-circle me-1"></i>Annuler</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white fw-semibold"><i class="bi bi-person me-2 text-primary"></i>Fiche patient</div>
+        <div class="card-body" style="font-size:.85rem">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="av" style="width:44px;height:44px;font-size:1rem;background:#e8f0fe;color:#0d6efd;border-radius:50%;">AS</div>
+            <div><div class="fw-bold">Aminata Sow</div><small class="text-muted">38 ans • Femme</small></div>
+          </div>
+          <div><i class="bi bi-telephone me-2 text-muted"></i>+221 77 123 45 67</div>
+          <div class="mt-1"><i class="bi bi-envelope me-2 text-muted"></i>aminata@mail.sn</div>
+          <div class="mt-2"><small class="text-muted fw-bold">Antécédents :</small> Glaucome familial, HTA</div>
+        </div>
+        <div class="card-footer bg-white">
+          <button class="btn btn-sm btn-outline-primary w-100" onclick="show('patient_detail')"><i class="bi bi-folder me-1"></i>Ouvrir le dossier complet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== RDV FORM ==================== -->
+<div id="rdv_form" class="screen">
+  <div class="bc"><span onclick="show('agenda')" style="cursor:pointer" class="text-primary">Agenda</span> / Nouveau RDV</div>
+  <div class="pt"><i class="bi bi-calendar-plus text-primary"></i>Planifier un rendez-vous</div>
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Patient <span class="text-danger">*</span></label>
+            <input class="form-control" placeholder="Rechercher un patient..." value="Aminata Sow">
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-sm-6"><label class="form-label fw-semibold">Date <span class="text-danger">*</span></label><input type="date" class="form-control" value="2026-04-11"></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Heure <span class="text-danger">*</span></label><input type="time" class="form-control" value="08:30"></div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-sm-6"><label class="form-label fw-semibold">Médecin</label><select class="form-select"><option>Dr Hassan Diallo</option></select></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Durée</label><select class="form-select"><option>15 min</option><option selected>30 min</option><option>45 min</option><option>1h</option></select></div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Motif</label>
+            <input class="form-control" placeholder="Ex : Suivi glaucome, Bilan annuel...">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Notes</label>
+            <textarea class="form-control" rows="3" placeholder="Informations complémentaires..."></textarea>
+          </div>
+        </div>
+        <div class="card-footer bg-white d-flex gap-2 justify-content-end">
+          <button class="btn btn-secondary" onclick="show('agenda')">Annuler</button>
+          <button class="btn btn-primary" onclick="show('rdv_detail')"><i class="bi bi-check-lg me-1"></i>Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PATIENTS LIST ==================== -->
+<div id="patients" class="screen">
+  <div class="pt"><i class="bi bi-people-fill text-primary"></i>Patients</div>
+  <div class="card shadow-sm mb-3">
+    <div class="card-body d-flex gap-2 flex-wrap align-items-center">
+      <div class="input-group" style="max-width:300px"><span class="input-group-text"><i class="bi bi-search"></i></span><input class="form-control" placeholder="Rechercher..."></div>
+      <select class="form-select" style="width:auto"><option>Tous statuts</option><option>Actif</option><option>Inactif</option></select>
+      <select class="form-select" style="width:auto"><option>Tous sexes</option><option>Homme</option><option>Femme</option></select>
+      <button class="btn btn-primary ms-auto" onclick="show('patient_form')"><i class="bi bi-person-plus me-1"></i>Nouveau patient</button>
+    </div>
+  </div>
+  <div class="card shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+      <span class="fw-semibold">247 patients</span><small class="text-muted">Page 1/25</small>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-light"><tr><th>N°</th><th>Nom complet</th><th>Âge</th><th>Sexe</th><th>Téléphone</th><th>Dernière consultation</th><th>Statut</th><th></th></tr></thead>
+        <tbody>
+          <tr style="cursor:pointer" onclick="show('patient_detail')"><td><small class="text-muted">000124</small></td><td><b>Aminata Sow</b></td><td>38 ans</td><td><span class="badge" style="background:#fce7f3;color:#9d174d">F</span></td><td>+221 77 123 45 67</td><td>08/04/2026</td><td><span class="badge bv">Actif</span></td><td><button class="btn btn-sm btn-outline-primary" onclick="show('patient_detail')">Ouvrir</button></td></tr>
+          <tr style="cursor:pointer" onclick="show('patient_detail')"><td><small class="text-muted">000123</small></td><td><b>Moussa Diallo</b></td><td>52 ans</td><td><span class="badge" style="background:#eff6ff;color:#1e40af">M</span></td><td>+221 76 987 65 43</td><td>07/04/2026</td><td><span class="badge bv">Actif</span></td><td><button class="btn btn-sm btn-outline-primary">Ouvrir</button></td></tr>
+          <tr style="cursor:pointer" onclick="show('patient_detail')"><td><small class="text-muted">000122</small></td><td><b>Fatou Ndiaye</b></td><td>61 ans</td><td><span class="badge" style="background:#fce7f3;color:#9d174d">F</span></td><td>+221 70 456 78 90</td><td>05/04/2026</td><td><span class="badge bv">Actif</span></td><td><button class="btn btn-sm btn-outline-primary">Ouvrir</button></td></tr>
+          <tr style="cursor:pointer" onclick="show('patient_detail')"><td><small class="text-muted">000121</small></td><td><b>Ibrahim Traoré</b></td><td>29 ans</td><td><span class="badge" style="background:#eff6ff;color:#1e40af">M</span></td><td>+221 77 321 00 11</td><td>01/04/2026</td><td><span class="badge bv">Actif</span></td><td><button class="btn btn-sm btn-outline-primary">Ouvrir</button></td></tr>
+          <tr style="cursor:pointer" onclick="show('patient_detail')"><td><small class="text-muted">000119</small></td><td><b>Omar Ba</b></td><td>45 ans</td><td><span class="badge" style="background:#eff6ff;color:#1e40af">M</span></td><td>+221 78 654 32 10</td><td>26/02/2026</td><td><span class="badge bb">À recontacter</span></td><td><button class="btn btn-sm btn-outline-primary">Ouvrir</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer bg-white d-flex justify-content-center">
+      <nav><ul class="pagination pagination-sm mb-0">
+        <li class="page-item disabled"><a class="page-link">«</a></li>
+        <li class="page-item active"><a class="page-link">1</a></li>
+        <li class="page-item"><a class="page-link">2</a></li>
+        <li class="page-item"><a class="page-link">3</a></li>
+        <li class="page-item"><a class="page-link">»</a></li>
+      </ul></nav>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PATIENT DETAIL ==================== -->
+<div id="patient_detail" class="screen">
+  <div class="bc"><span onclick="show('patients')" style="cursor:pointer" class="text-primary">Patients</span> / Aminata Sow</div>
+  <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+    <div class="av" style="width:52px;height:52px;font-size:1.2rem;background:#e8f0fe;color:#0d6efd;border-radius:50%;">AS</div>
+    <div>
+      <div class="pt mb-0">Aminata Sow</div>
+      <div class="d-flex gap-2 flex-wrap"><span class="badge bg-secondary-subtle text-secondary border">38 ans</span><span class="badge" style="background:#fce7f3;color:#9d174d">Femme</span><span class="badge bv">Actif</span><small class="text-muted">Dossier N° 000124</small></div>
+    </div>
+    <div class="ms-auto d-flex gap-2 flex-wrap">
+      <button class="btn btn-sm btn-outline-secondary" onclick="show('patient_form')"><i class="bi bi-pencil me-1"></i>Modifier</button>
+      <button class="btn btn-sm btn-outline-primary" onclick="show('rdv_form')"><i class="bi bi-calendar-plus me-1"></i>Planifier RDV</button>
+      <button class="btn btn-sm btn-primary" onclick="show('consultation_form')"><i class="bi bi-clipboard2-plus me-1"></i>Nouvelle consultation</button>
+      <button class="btn btn-sm btn-success" onclick="show('chirurgie_form')"><i class="bi bi-hospital me-1"></i>Planifier une intervention</button>
+    </div>
+  </div>
+  <div class="row g-3">
+    <div class="col-lg-4">
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white fw-semibold"><i class="bi bi-person-badge me-2 text-primary"></i>Informations</div>
+        <div class="card-body" style="font-size:.84rem">
+          <div class="row g-2">
+            <div class="col-6"><small class="text-muted d-block">Nom</small>Sow</div>
+            <div class="col-6"><small class="text-muted d-block">Prénom</small>Aminata</div>
+            <div class="col-6"><small class="text-muted d-block">Naissance</small>15/03/1988</div>
+            <div class="col-6"><small class="text-muted d-block">Téléphone</small>+221 77 123 45 67</div>
+            <div class="col-12"><small class="text-muted d-block">Email</small>aminata.sow@mail.sn</div>
+            <div class="col-12"><small class="text-muted d-block">Adresse</small>Dakar, Plateau</div>
+          </div>
+        </div>
+      </div>
+      <div class="card shadow-sm">
+        <div class="card-header bg-white fw-semibold"><i class="bi bi-clipboard2-heart me-2 text-danger"></i>Médical</div>
+        <div class="card-body" style="font-size:.84rem">
+          <small class="text-muted fw-bold d-block mb-1">Antécédents</small>
+          <p class="mb-2">Glaucome chronique familial. HTA depuis 2019 sous antihypertenseurs.</p>
+          <small class="text-muted fw-bold d-block mb-1">Allergies</small>
+          <span class="badge bg-danger-subtle text-danger border">Pénicilline</span>
+          <small class="text-muted fw-bold d-block mt-2 mb-1">Traitement en cours</small>
+          <p class="mb-0">Timolol 0.5% — 1 goutte 2×/j OD</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-8">
+      <!-- Consultations -->
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <span class="fw-semibold"><i class="bi bi-clipboard2-pulse me-2 text-primary"></i>Consultations (12)</span>
+          <button class="btn btn-sm btn-outline-primary" onclick="show('consultation_form')"><i class="bi bi-plus me-1"></i>Nouvelle</button>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover mb-0 align-middle" style="font-size:.83rem">
+            <thead class="table-light"><tr><th>Date</th><th>Médecin</th><th>Diagnostic</th><th>TOD/TOG</th><th>Statut</th><th></th></tr></thead>
+            <tbody>
+              <tr style="cursor:pointer" onclick="show('consultation_detail')"><td>08/04/2026</td><td>Dr H. Diallo</td><td>Glaucome OD — suivi</td><td class="text-danger fw-bold">24 / 16</td><td><span class="badge bv">Validée</span></td><td><button class="btn btn-sm btn-outline-primary" onclick="show('consultation_detail')">Voir</button></td></tr>
+              <tr style="cursor:pointer" onclick="show('consultation_detail')"><td>12/01/2026</td><td>Dr H. Diallo</td><td>Contrôle tension oculaire</td><td>22 / 15</td><td><span class="badge bv">Validée</span></td><td><button class="btn btn-sm btn-outline-primary">Voir</button></td></tr>
+              <tr style="cursor:pointer" onclick="show('consultation_detail')"><td>03/09/2025</td><td>Dr H. Diallo</td><td>Bilan ophtalmologique</td><td>21 / 14</td><td><span class="badge bv">Validée</span></td><td><button class="btn btn-sm btn-outline-primary">Voir</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Prescriptions -->
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <span class="fw-semibold"><i class="bi bi-file-earmark-medical me-2 text-success"></i>Prescriptions (5)</span>
+          <button class="btn btn-sm btn-outline-success" onclick="show('prescriptions')">Voir toutes</button>
+        </div>
+        <div class="card-body p-0">
+          <div class="list-group list-group-flush">
+            <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-3" style="font-size:.83rem">
+              <div><i class="bi bi-capsule text-success me-2"></i><b>Traitement médical</b><small class="text-muted ms-2">08/04/2026</small></div>
+              <button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="show('pdf')"><i class="bi bi-filetype-pdf"></i></button>
+            </div>
+            <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-3" style="font-size:.83rem">
+              <div><i class="bi bi-eyeglasses text-primary me-2"></i><b>Lunettes</b><small class="text-muted ms-2">08/04/2026</small></div>
+              <button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="show('pdf')"><i class="bi bi-filetype-pdf"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Interventions -->
+      <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <span class="fw-semibold"><i class="bi bi-hospital me-2 text-info"></i>Chirurgie (1)</span>
+          <button class="btn btn-sm btn-outline-info" onclick="show('chirurgie_form')"><i class="bi bi-plus me-1"></i>Planifier</button>
+        </div>
+        <div class="card-body p-0">
+          <div class="list-group list-group-flush">
+            <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-3" style="cursor:pointer;font-size:.83rem" onclick="show('chirurgie_detail')">
+              <div><i class="bi bi-hospital text-info me-2"></i><b>Cataracte OD</b><small class="text-muted ms-2">15/04/2026</small></div>
+              <span class="badge bg-warning-subtle text-warning border">Pré-op validée</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PATIENT FORM ==================== -->
+<div id="patient_form" class="screen">
+  <div class="bc"><span onclick="show('patients')" style="cursor:pointer" class="text-primary">Patients</span> / Nouveau patient</div>
+  <div class="pt"><i class="bi bi-person-plus text-primary"></i>Nouveau patient</div>
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white fw-semibold">Informations personnelles</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-sm-6"><label class="form-label fw-semibold">Nom <span class="text-danger">*</span></label><input class="form-control" placeholder="Nom de famille"></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Prénom <span class="text-danger">*</span></label><input class="form-control" placeholder="Prénom"></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Date de naissance <span class="text-danger">*</span></label><input type="date" class="form-control"></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Sexe <span class="text-danger">*</span></label><select class="form-select"><option value="">—</option><option>Homme</option><option>Femme</option></select></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Téléphone <span class="text-danger">*</span></label><input class="form-control" placeholder="+221 7X XXX XX XX"></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Email</label><input class="form-control" type="email" placeholder="email@exemple.com"></div>
+            <div class="col-12"><label class="form-label fw-semibold">Adresse</label><input class="form-control" placeholder="Ville, quartier..."></div>
+          </div>
+        </div>
+        <div class="card-header bg-white fw-semibold border-top">Informations médicales</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-12"><label class="form-label fw-semibold">Antécédents médicaux</label><textarea class="form-control" rows="2" placeholder="Maladies, chirurgies passées..."></textarea></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Allergies</label><input class="form-control" placeholder="Médicaments, substances..."></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Traitements en cours</label><input class="form-control" placeholder="Nom, posologie..."></div>
+          </div>
+        </div>
+        <div class="card-footer bg-white d-flex gap-2 justify-content-end">
+          <button class="btn btn-secondary" onclick="show('patients')">Annuler</button>
+          <button class="btn btn-primary" onclick="show('patient_detail')"><i class="bi bi-check-lg me-1"></i>Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CONSULTATIONS LIST ==================== -->
+<div id="consultations" class="screen">
+  <div class="pt"><i class="bi bi-clipboard2-pulse-fill text-primary"></i>Consultations</div>
+  <div class="card shadow-sm mb-3">
+    <div class="card-body d-flex gap-2 flex-wrap align-items-center">
+      <div class="input-group" style="max-width:280px"><span class="input-group-text"><i class="bi bi-search"></i></span><input class="form-control" placeholder="Patient..."></div>
+      <select class="form-select" style="width:auto"><option>Tous statuts</option><option>Validée</option><option>Brouillon</option><option>Annulée</option></select>
+      <input type="date" class="form-control" style="width:auto" value="2026-04-11">
+      <button class="btn btn-primary ms-auto" onclick="show('consultation_form')"><i class="bi bi-plus me-1"></i>Nouvelle</button>
+    </div>
+  </div>
+  <div class="card shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-light"><tr><th>Date</th><th>Patient</th><th>Médecin</th><th>Diagnostic</th><th>TOD/TOG</th><th>Statut</th><th></th></tr></thead>
+        <tbody>
+          <tr style="cursor:pointer" onclick="show('consultation_detail')"><td>08/04/2026 09:30</td><td><b>Aminata Sow</b></td><td>Dr H. Diallo</td><td>Glaucome OD — suivi</td><td class="text-danger fw-bold">24/16</td><td><span class="badge bv">Validée</span></td><td><button class="btn btn-sm btn-outline-primary">Voir</button></td></tr>
+          <tr style="cursor:pointer" onclick="show('consultation_detail')"><td>07/04/2026 10:00</td><td><b>Moussa Diallo</b></td><td>Dr H. Diallo</td><td>Bilan annuel</td><td>14/14</td><td><span class="badge bv">Validée</span></td><td><button class="btn btn-sm btn-outline-primary">Voir</button></td></tr>
+          <tr style="cursor:pointer" onclick="show('consultation_detail')"><td>11/04/2026 08:30</td><td><b>Ibrahim Traoré</b></td><td>Dr H. Diallo</td><td>Myopie — prescription</td><td>12/12</td><td><span class="badge bb">Brouillon</span></td><td><button class="btn btn-sm btn-outline-primary">Voir</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CONSULTATION DETAIL ==================== -->
+<div id="consultation_detail" class="screen">
+  <div class="bc"><span onclick="show('consultations')" style="cursor:pointer" class="text-primary">Consultations</span> / Aminata Sow — 08/04/2026</div>
+  <div class="pt"><i class="bi bi-clipboard2-pulse-fill text-primary"></i>Consultation — Aminata Sow</div>
+  <div class="row g-3">
+    <div class="col-lg-8">
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <span class="fw-semibold"><i class="bi bi-info-circle me-2 text-primary"></i>08/04/2026 à 09:30 — Dr Hassan Diallo</span>
+          <div class="d-flex gap-2">
+            <span class="badge bv fs-6">Validée</span>
+            <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil me-1"></i>Modifier</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <div class="border rounded p-3">
+                <div class="fw-bold text-primary mb-2">Oeil Droit (OD)</div>
+                <div class="d-flex justify-content-between mb-1"><small class="text-muted">Acuité (loin)</small><span>8/10</span></div>
+                <div class="d-flex justify-content-between mb-1"><small class="text-muted">Acuité (près)</small><span>P3</span></div>
+                <div class="d-flex justify-content-between"><small class="text-muted">Tension (TOD)</small><span class="text-danger fw-bold">24 mmHg</span></div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="border rounded p-3">
+                <div class="fw-bold text-primary mb-2">Oeil Gauche (OG)</div>
+                <div class="d-flex justify-content-between mb-1"><small class="text-muted">Acuité (loin)</small><span>9/10</span></div>
+                <div class="d-flex justify-content-between mb-1"><small class="text-muted">Acuité (près)</small><span>P2</span></div>
+                <div class="d-flex justify-content-between"><small class="text-muted">Tension (TOG)</small><span>16 mmHg</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3">
+            <small class="text-muted fw-bold d-block mb-1">Diagnostic principal</small>
+            <p class="mb-0">Glaucome chronique à angle ouvert OD. Tension élevée malgré traitement en cours. Champ visuel à surveiller.</p>
+          </div>
+          <div class="mt-3">
+            <small class="text-muted fw-bold d-block mb-1">Conduite à tenir</small>
+            <p class="mb-0">Augmenter posologie Timolol. Prévoir champ visuel dans 1 mois. Recontroler TOD dans 3 semaines.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prescriptions block -->
+      <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <span class="fw-semibold"><i class="bi bi-file-earmark-medical me-2 text-success"></i>Prescriptions (2)</span>
+          <div class="dropdown">
+            <button class="btn btn-sm btn-success dropdown-toggle" data-bs-toggle="dropdown"><i class="bi bi-plus me-1"></i>Ajouter</button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#"><i class="bi bi-eyeglasses me-2"></i>Lunettes</a></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-capsule me-2"></i>Traitement médical</a></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-microscope me-2"></i>Examens complémentaires</a></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-circle me-2"></i>Lentilles de contact</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="list-group list-group-flush">
+            <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+              <div><i class="bi bi-capsule text-success me-2"></i><b>Traitement médical</b><small class="text-muted ms-2">08/04/2026</small></div>
+              <div class="d-flex gap-1 align-items-center">
+                <span class="badge bg-success-subtle text-success border">Imprimée</span>
+                <button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="show('pdf')"><i class="bi bi-filetype-pdf"></i></button>
+              </div>
+            </div>
+            <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+              <div><i class="bi bi-eyeglasses text-primary me-2"></i><b>Lunettes</b><small class="text-muted ms-2">08/04/2026</small></div>
+              <div class="d-flex gap-1 align-items-center">
+                <span class="badge bg-warning-subtle text-warning border">Non imprimée</span>
+                <button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="show('pdf')"><i class="bi bi-filetype-pdf"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white fw-semibold"><i class="bi bi-person me-2 text-primary"></i>Patient</div>
+        <div class="card-body" style="font-size:.84rem">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="av" style="width:44px;height:44px;font-size:1rem;background:#e8f0fe;color:#0d6efd;border-radius:50%;">AS</div>
+            <div><div class="fw-bold">Aminata Sow</div><small class="text-muted">38 ans • Femme</small></div>
+          </div>
+          <div><i class="bi bi-telephone me-2 text-muted"></i>+221 77 123 45 67</div>
+          <div class="mt-1"><i class="bi bi-exclamation-triangle me-2 text-danger"></i><small class="text-danger">Allergie : Pénicilline</small></div>
+        </div>
+        <div class="card-footer bg-white d-grid gap-1">
+          <button class="btn btn-sm btn-outline-primary" onclick="show('patient_detail')"><i class="bi bi-folder me-1"></i>Ouvrir le dossier</button>
+          <button class="btn btn-sm btn-outline-secondary" onclick="show('rdv_form')"><i class="bi bi-calendar-plus me-1"></i>Planifier RDV</button>
+        </div>
+      </div>
+      <div class="card shadow-sm">
+        <div class="card-header bg-white fw-semibold"><i class="bi bi-calendar-check me-2 text-success"></i>RDV associé</div>
+        <div class="card-body" style="font-size:.84rem">
+          <div><i class="bi bi-clock me-1 text-muted"></i>08/04/2026 à 09:30</div>
+          <div class="mt-1"><i class="bi bi-tag me-1 text-muted"></i>Consultation de suivi</div>
+          <div class="mt-2"><span class="badge bv">Confirmé</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CONSULTATION FORM ==================== -->
+<div id="consultation_form" class="screen">
+  <div class="bc"><span onclick="show('consultations')" style="cursor:pointer" class="text-primary">Consultations</span> / Nouvelle consultation</div>
+  <div class="pt"><i class="bi bi-clipboard2-plus text-primary"></i>Nouvelle consultation</div>
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white fw-semibold">Informations générales</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-sm-6"><label class="form-label fw-semibold">Patient <span class="text-danger">*</span></label><input class="form-control" value="Aminata Sow"></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Médecin</label><select class="form-select"><option>Dr Hassan Diallo</option></select></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Date <span class="text-danger">*</span></label><input type="date" class="form-control" value="2026-04-11"></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Heure</label><input type="time" class="form-control" value="08:30"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white fw-semibold">Examen clinique</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="border rounded p-3">
+                <div class="fw-bold text-primary mb-2">Oeil Droit (OD)</div>
+                <div class="row g-2">
+                  <div class="col-6"><label class="form-label small">Acuité loin</label><input class="form-control form-control-sm" placeholder="ex: 10/10"></div>
+                  <div class="col-6"><label class="form-label small">Acuité près</label><input class="form-control form-control-sm" placeholder="P1–P14"></div>
+                  <div class="col-6"><label class="form-label small">Tension (mmHg)</label><input class="form-control form-control-sm" placeholder="mmHg"></div>
+                  <div class="col-6"><label class="form-label small">Réfraction</label><input class="form-control form-control-sm" placeholder="sphère"></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="border rounded p-3">
+                <div class="fw-bold text-primary mb-2">Oeil Gauche (OG)</div>
+                <div class="row g-2">
+                  <div class="col-6"><label class="form-label small">Acuité loin</label><input class="form-control form-control-sm" placeholder="ex: 10/10"></div>
+                  <div class="col-6"><label class="form-label small">Acuité près</label><input class="form-control form-control-sm" placeholder="P1–P14"></div>
+                  <div class="col-6"><label class="form-label small">Tension (mmHg)</label><input class="form-control form-control-sm" placeholder="mmHg"></div>
+                  <div class="col-6"><label class="form-label small">Réfraction</label><input class="form-control form-control-sm" placeholder="sphère"></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12"><label class="form-label fw-semibold">Diagnostic principal</label><textarea class="form-control" rows="2"></textarea></div>
+            <div class="col-12"><label class="form-label fw-semibold">Conduite à tenir</label><textarea class="form-control" rows="2"></textarea></div>
+          </div>
+        </div>
+        <div class="card-footer bg-white d-flex gap-2 justify-content-end">
+          <button class="btn btn-secondary" onclick="show('consultations')">Annuler</button>
+          <button class="btn btn-outline-primary" onclick="show('consultation_detail')"><i class="bi bi-floppy me-1"></i>Enregistrer brouillon</button>
+          <button class="btn btn-primary" onclick="show('consultation_detail')"><i class="bi bi-check-lg me-1"></i>Valider</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PRESCRIPTIONS ==================== -->
+<div id="prescriptions" class="screen">
+  <div class="pt"><i class="bi bi-file-earmark-medical text-primary"></i>Prescriptions</div>
+  <div class="card shadow-sm mb-3">
+    <div class="card-body d-flex gap-2 flex-wrap align-items-center">
+      <div class="input-group" style="max-width:280px"><span class="input-group-text"><i class="bi bi-search"></i></span><input class="form-control" placeholder="Patient..."></div>
+      <select class="form-select" style="width:auto"><option>Tous types</option><option>Lunettes</option><option>Traitement</option><option>Examens</option><option>Lentilles</option></select>
+    </div>
+  </div>
+  <div class="card shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-light"><tr><th>Réf.</th><th>Patient</th><th>Type</th><th>Date</th><th>Médecin</th><th>Statut</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><small class="text-muted">PRESC-000045</small></td><td style="cursor:pointer;color:var(--blue)" onclick="show('patient_detail')">Aminata Sow</td><td><span class="badge bg-success-subtle text-success border">Traitement</span></td><td>08/04/2026</td><td>Dr H. Diallo</td><td><span class="badge bv">Imprimée</span></td><td><button class="btn btn-sm btn-outline-primary" onclick="show('pdf')"><i class="bi bi-filetype-pdf"></i></button></td></tr>
+          <tr><td><small class="text-muted">PRESC-000044</small></td><td style="cursor:pointer;color:var(--blue)" onclick="show('patient_detail')">Aminata Sow</td><td><span class="badge bg-primary-subtle text-primary border">Lunettes</span></td><td>08/04/2026</td><td>Dr H. Diallo</td><td><span class="badge bb">Non imprimée</span></td><td><button class="btn btn-sm btn-outline-primary" onclick="show('pdf')"><i class="bi bi-filetype-pdf"></i></button></td></tr>
+          <tr><td><small class="text-muted">PRESC-000043</small></td><td style="cursor:pointer;color:var(--blue)" onclick="show('patient_detail')">Moussa Diallo</td><td><span class="badge bg-info-subtle text-info border">Examens</span></td><td>07/04/2026</td><td>Dr H. Diallo</td><td><span class="badge bv">Imprimée</span></td><td><button class="btn btn-sm btn-outline-primary" onclick="show('pdf')"><i class="bi bi-filetype-pdf"></i></button></td></tr>
+          <tr><td><small class="text-muted">PRESC-000042</small></td><td style="cursor:pointer;color:var(--blue)" onclick="show('patient_detail')">Fatou Ndiaye</td><td><span class="badge bg-warning-subtle text-warning border">Lentilles</span></td><td>05/04/2026</td><td>Dr H. Diallo</td><td><span class="badge bv">Imprimée</span></td><td><button class="btn btn-sm btn-outline-primary" onclick="show('pdf')"><i class="bi bi-filetype-pdf"></i></button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CHIRURGIE LIST ==================== -->
+<div id="chirurgie" class="screen">
+  <div class="pt"><i class="bi bi-hospital text-primary"></i>Module Chirurgie</div>
+  <div class="row g-3 mb-3">
+    <div class="col-6 col-xl-3"><div class="card shadow-sm"><div class="card-body d-flex align-items-center gap-3"><div class="si bg-primary-subtle text-primary"><i class="bi bi-calendar-check"></i></div><div><div class="sv">12</div><div class="slb">Planifiées</div></div></div></div></div>
+    <div class="col-6 col-xl-3"><div class="card shadow-sm"><div class="card-body d-flex align-items-center gap-3"><div class="si bg-warning-subtle text-warning"><i class="bi bi-clipboard-check"></i></div><div><div class="sv">4</div><div class="slb">Pré-op validées</div></div></div></div></div>
+    <div class="col-6 col-xl-3"><div class="card shadow-sm"><div class="card-body d-flex align-items-center gap-3"><div class="si bg-success-subtle text-success"><i class="bi bi-check-circle-fill"></i></div><div><div class="sv">38</div><div class="slb">Réalisées</div></div></div></div></div>
+    <div class="col-6 col-xl-3"><div class="card shadow-sm"><div class="card-body d-flex align-items-center gap-3"><div class="si bg-danger-subtle text-danger"><i class="bi bi-x-circle"></i></div><div><div class="sv">2</div><div class="slb">Annulées</div></div></div></div></div>
+  </div>
+  <div class="card shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+      <span class="fw-semibold"><i class="bi bi-list-ul me-2"></i>Interventions</span>
+      <button class="btn btn-sm btn-primary" onclick="show('chirurgie_form')"><i class="bi bi-plus me-1"></i>Planifier</button>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-light"><tr><th>Patient</th><th>Type</th><th>Oeil</th><th>Date prévue</th><th>Chirurgien</th><th>Statut</th><th></th></tr></thead>
+        <tbody>
+          <tr style="cursor:pointer" onclick="show('chirurgie_detail')"><td><b>Fatou Ndiaye</b></td><td>Cataracte</td><td><span class="badge bg-primary-subtle text-primary border">OD</span></td><td>15/04/2026</td><td>Dr H. Diallo</td><td><span class="badge bg-warning-subtle text-warning border">Pré-op validée</span></td><td><button class="btn btn-sm btn-outline-primary">Voir</button></td></tr>
+          <tr style="cursor:pointer" onclick="show('chirurgie_detail')"><td><b>Seydou Fall</b></td><td>Glaucome</td><td><span class="badge bg-info-subtle text-info border">OG</span></td><td>18/04/2026</td><td>Dr H. Diallo</td><td><span class="badge bg-primary-subtle text-primary border">Planifiée</span></td><td><button class="btn btn-sm btn-outline-primary">Voir</button></td></tr>
+          <tr style="cursor:pointer" onclick="show('chirurgie_detail')"><td><b>Binta Camara</b></td><td>LASIK</td><td><span class="badge bg-secondary-subtle text-secondary border">Les deux</span></td><td>10/04/2026</td><td>Dr H. Diallo</td><td><span class="badge bv">Réalisée</span></td><td><button class="btn btn-sm btn-outline-primary">Voir</button></td></tr>
+          <tr style="cursor:pointer" onclick="show('chirurgie_detail')"><td><b>Cheikh Diop</b></td><td>Ptérygion</td><td><span class="badge bg-primary-subtle text-primary border">OD</span></td><td>22/04/2026</td><td>Dr H. Diallo</td><td><span class="badge bg-primary-subtle text-primary border">Planifiée</span></td><td><button class="btn btn-sm btn-outline-primary">Voir</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CHIRURGIE DETAIL ==================== -->
+<div id="chirurgie_detail" class="screen">
+  <div class="bc"><span onclick="show('chirurgie')" style="cursor:pointer" class="text-primary">Chirurgie</span> / Fatou Ndiaye — Cataracte OD</div>
+  <div class="pt"><i class="bi bi-hospital text-primary"></i>Intervention — Fatou Ndiaye</div>
+  <div class="row g-3">
+    <div class="col-lg-7">
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <span class="fw-semibold"><i class="bi bi-clipboard me-2 text-primary"></i>Détails de l'intervention</span>
+          <span class="badge bg-warning-subtle text-warning border fs-6">Pré-op validée</span>
+        </div>
+        <div class="card-body" style="font-size:.87rem">
+          <div class="row g-3">
+            <div class="col-sm-6"><small class="text-muted d-block">Patient</small><span class="fw-bold" style="cursor:pointer;color:var(--blue)" onclick="show('patient_detail')">Fatou Ndiaye</span></div>
+            <div class="col-sm-6"><small class="text-muted d-block">Type d'intervention</small><span class="fw-bold">Cataracte</span></div>
+            <div class="col-sm-6"><small class="text-muted d-block">Oeil opéré</small><span>Oeil droit (OD)</span></div>
+            <div class="col-sm-6"><small class="text-muted d-block">Date prévue</small><span>15/04/2026 à 08:00</span></div>
+            <div class="col-sm-6"><small class="text-muted d-block">Chirurgien</small><span>Dr Hassan Diallo</span></div>
+            <div class="col-sm-6"><small class="text-muted d-block">Anesthésie</small><span>Topique</span></div>
+          </div>
+          <hr>
+          <small class="text-muted fw-bold d-block mb-1">Notes pré-opératoires</small>
+          <p class="mb-0">Bilan bio OK. IOL calculée : +21.5D. Patient informé des risques. Consentement signé.</p>
+        </div>
+        <div class="card-footer bg-white d-flex gap-2 flex-wrap">
+          <button class="btn btn-sm btn-success"><i class="bi bi-check-circle me-1"></i>Valider pré-op</button>
+          <button class="btn btn-sm btn-primary" onclick="show('compte_rendu')"><i class="bi bi-pencil-square me-1"></i>Compte-rendu opératoire</button>
+          <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-calendar-plus me-1"></i>Lier un RDV</button>
+          <button class="btn btn-sm btn-outline-danger ms-auto"><i class="bi bi-x-circle me-1"></i>Annuler</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white fw-semibold"><i class="bi bi-arrow-right-circle me-2 text-primary"></i>Suivi post-opératoire</div>
+        <div class="card-body">
+          <div class="tl">
+            <div class="ti">
+              <div class="td"></div>
+              <div class="fw-semibold small">J+1 — 16/04/2026</div>
+              <small class="text-muted">En attente</small>
+              <div class="mt-1"><button class="btn btn-xs btn-outline-primary btn-sm py-0 px-2" onclick="show('suivi_form')">Saisir</button></div>
+            </div>
+            <div class="ti">
+              <div class="td"></div>
+              <div class="fw-semibold small">J+7 — 22/04/2026</div>
+              <small class="text-muted">En attente</small>
+              <div class="mt-1"><button class="btn btn-xs btn-outline-primary btn-sm py-0 px-2" onclick="show('suivi_form')">Saisir</button></div>
+            </div>
+            <div class="ti">
+              <div class="td"></div>
+              <div class="fw-semibold small">J+30 — 15/05/2026</div>
+              <small class="text-muted">En attente</small>
+              <div class="mt-1"><button class="btn btn-xs btn-outline-primary btn-sm py-0 px-2" onclick="show('suivi_form')">Saisir</button></div>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-outline-success w-100 mt-2" onclick="show('suivi_form')"><i class="bi bi-plus me-1"></i>Ajouter suivi personnalisé</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CHIRURGIE FORM ==================== -->
+<div id="chirurgie_form" class="screen">
+  <div class="bc"><span onclick="show('chirurgie')" style="cursor:pointer" class="text-primary">Chirurgie</span> / Planifier une intervention</div>
+  <div class="pt"><i class="bi bi-hospital text-primary"></i>Planifier une intervention</div>
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="mb-3"><label class="form-label fw-semibold">Patient <span class="text-danger">*</span></label><input class="form-control" placeholder="Rechercher un patient..." value="Fatou Ndiaye"></div>
+          <div class="mb-3"><label class="form-label fw-semibold">Type d'intervention <span class="text-danger">*</span></label>
+            <select class="form-select"><option>Cataracte</option><option>Glaucome</option><option>Décollement de rétine</option><option>LASIK</option><option>Strabisme</option><option>Ptérygion</option><option>Greffe de cornée</option><option>Autre</option></select>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-sm-6"><label class="form-label fw-semibold">Oeil opéré <span class="text-danger">*</span></label><select class="form-select"><option>Oeil droit (OD)</option><option>Oeil gauche (OG)</option><option>Les deux</option></select></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Date prévue <span class="text-danger">*</span></label><input type="date" class="form-control" value="2026-04-15"></div>
+          </div>
+          <div class="mb-3"><label class="form-label fw-semibold">Chirurgien</label><select class="form-select"><option>Dr Hassan Diallo</option></select></div>
+          <div class="mb-3"><label class="form-label fw-semibold">Notes pré-opératoires</label><textarea class="form-control" rows="3"></textarea></div>
+          <div class="alert alert-info py-2" style="font-size:.82rem"><i class="bi bi-info-circle me-1"></i>Les suivis J+1, J+7 et J+30 seront créés automatiquement après la réalisation.</div>
+        </div>
+        <div class="card-footer bg-white d-flex gap-2 justify-content-end">
+          <button class="btn btn-secondary" onclick="show('chirurgie')">Annuler</button>
+          <button class="btn btn-primary" onclick="show('chirurgie_detail')"><i class="bi bi-check-lg me-1"></i>Planifier</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== COMPTE-RENDU ==================== -->
+<div id="compte_rendu" class="screen">
+  <div class="bc"><span onclick="show('chirurgie_detail')" style="cursor:pointer" class="text-primary">Intervention</span> / Compte-rendu opératoire</div>
+  <div class="pt"><i class="bi bi-pencil-square text-primary"></i>Compte-rendu opératoire — Fatou Ndiaye</div>
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-sm-6"><label class="form-label fw-semibold">Date de réalisation</label><input type="date" class="form-control" value="2026-04-15"></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Durée (minutes)</label><input type="number" class="form-control" value="45"></div>
+            <div class="col-12"><label class="form-label fw-semibold">Technique opératoire</label><textarea class="form-control" rows="3" placeholder="Description de la technique chirurgicale utilisée...">Phacoémulsification par voie temporale. IOL +21.5D implantée en sac capsulaire. Pas de complication peropératoire.</textarea></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Anesthésie utilisée</label><select class="form-select"><option>Topique</option><option>Locale</option><option>Générale</option></select></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Complications</label><select class="form-select"><option selected>Aucune</option><option>Déchirure capsulaire</option><option>Autre</option></select></div>
+            <div class="col-12"><label class="form-label fw-semibold">Résultat / Conduite post-op</label><textarea class="form-control" rows="3" placeholder="Résultat de l'intervention, prescriptions post-op...">Résultat satisfaisant. Prescription : collyres antibiotiques + anti-inflammatoires 4×/j pendant 1 mois. RDV J+1 le 16/04.</textarea></div>
+          </div>
+        </div>
+        <div class="card-footer bg-white d-flex gap-2 justify-content-end">
+          <button class="btn btn-secondary" onclick="show('chirurgie_detail')">Annuler</button>
+          <button class="btn btn-success" onclick="show('chirurgie_detail')"><i class="bi bi-check-lg me-1"></i>Valider le compte-rendu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SUIVI POST-OP ==================== -->
+<div id="suivi_form" class="screen">
+  <div class="bc"><span onclick="show('chirurgie_detail')" style="cursor:pointer" class="text-primary">Intervention</span> / Saisir un suivi</div>
+  <div class="pt"><i class="bi bi-clipboard2-check text-primary"></i>Suivi post-opératoire J+1</div>
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-sm-6"><label class="form-label fw-semibold">Type de suivi</label><select class="form-select"><option>J+1</option><option>J+7</option><option>J+30</option><option>J+90</option><option>Autre</option></select></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Date</label><input type="date" class="form-control" value="2026-04-16"></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Acuité visuelle OD</label><input class="form-control" placeholder="ex: 5/10"></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Tension OD (mmHg)</label><input class="form-control" placeholder="ex: 14"></div>
+            <div class="col-12"><label class="form-label fw-semibold">Observations</label><textarea class="form-control" rows="3" placeholder="État de la plaie, chambre antérieure, reflet pupillaire..."></textarea></div>
+            <div class="col-12"><label class="form-label fw-semibold">Traitement prescrit</label><textarea class="form-control" rows="2" placeholder="Collyres, médicaments..."></textarea></div>
+          </div>
+        </div>
+        <div class="card-footer bg-white d-flex gap-2 justify-content-end">
+          <button class="btn btn-secondary" onclick="show('chirurgie_detail')">Annuler</button>
+          <button class="btn btn-primary" onclick="show('chirurgie_detail')"><i class="bi bi-check-lg me-1"></i>Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAIEMENTS ==================== -->
+<div id="paiements" class="screen">
+  <div class="pt"><i class="bi bi-cash-coin text-primary"></i>Paiements</div>
+  <div class="row g-3 mb-3">
+    <div class="col-sm-4"><div class="card shadow-sm"><div class="card-body d-flex align-items-center gap-3"><div class="si bg-success-subtle text-success"><i class="bi bi-cash-stack"></i></div><div><div class="sv" style="font-size:1.1rem">185 000 FCFA</div><div class="slb">Encaissé ce mois</div></div></div></div></div>
+    <div class="col-sm-4"><div class="card shadow-sm"><div class="card-body d-flex align-items-center gap-3"><div class="si bg-warning-subtle text-warning"><i class="bi bi-hourglass-split"></i></div><div><div class="sv" style="font-size:1.1rem">42 500 FCFA</div><div class="slb">En attente</div></div></div></div></div>
+    <div class="col-sm-4"><div class="card shadow-sm"><div class="card-body d-flex align-items-center gap-3"><div class="si bg-danger-subtle text-danger"><i class="bi bi-exclamation-triangle-fill"></i></div><div><div class="sv">5</div><div class="slb">Impayés &gt;30j</div></div></div></div></div>
+  </div>
+  <div class="card shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+      <span class="fw-semibold">Historique des paiements</span>
+      <button class="btn btn-sm btn-primary" onclick="show('paiement_form')"><i class="bi bi-plus me-1"></i>Enregistrer paiement</button>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-light"><tr><th>Réf.</th><th>Patient</th><th>Montant</th><th>Prestation</th><th>Date</th><th>Statut</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><small class="text-muted">PAY-000089</small></td><td style="cursor:pointer;color:var(--blue)" onclick="show('patient_detail')">Aminata Sow</td><td class="fw-bold">25 000 FCFA</td><td>Consultation</td><td>08/04/2026</td><td><span class="badge bv">Payé</span></td><td><button class="btn btn-sm btn-outline-secondary"><i class="bi bi-receipt"></i></button></td></tr>
+          <tr><td><small class="text-muted">PAY-000088</small></td><td style="cursor:pointer;color:var(--blue)" onclick="show('patient_detail')">Moussa Diallo</td><td class="fw-bold">35 000 FCFA</td><td>Bilan complet</td><td>07/04/2026</td><td><span class="badge bv">Payé</span></td><td><button class="btn btn-sm btn-outline-secondary"><i class="bi bi-receipt"></i></button></td></tr>
+          <tr><td><small class="text-muted">PAY-000087</small></td><td style="cursor:pointer;color:var(--blue)" onclick="show('patient_detail')">Fatou Ndiaye</td><td class="fw-bold">120 000 FCFA</td><td>Chirurgie cataracte</td><td>05/04/2026</td><td><span class="badge bb">Partiel</span></td><td><button class="btn btn-sm btn-outline-primary" onclick="show('paiement_form')"><i class="bi bi-pencil"></i></button></td></tr>
+          <tr><td><small class="text-muted">PAY-000085</small></td><td style="cursor:pointer;color:var(--blue)" onclick="show('patient_detail')">Omar Ba</td><td class="fw-bold">15 000 FCFA</td><td>Consultation</td><td>26/02/2026</td><td><span class="badge br">Impayé</span></td><td><button class="btn btn-sm btn-outline-primary" onclick="show('paiement_form')"><i class="bi bi-pencil"></i></button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAIEMENT FORM ==================== -->
+<div id="paiement_form" class="screen">
+  <div class="bc"><span onclick="show('paiements')" style="cursor:pointer" class="text-primary">Paiements</span> / Enregistrer un paiement</div>
+  <div class="pt"><i class="bi bi-cash-coin text-primary"></i>Enregistrer un paiement</div>
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="mb-3"><label class="form-label fw-semibold">Patient <span class="text-danger">*</span></label><input class="form-control" value="Omar Ba"></div>
+          <div class="mb-3"><label class="form-label fw-semibold">Prestation <span class="text-danger">*</span></label><select class="form-select"><option>Consultation</option><option>Bilan complet</option><option>Chirurgie</option><option>Prescription</option><option>Autre</option></select></div>
+          <div class="row g-3 mb-3">
+            <div class="col-sm-6"><label class="form-label fw-semibold">Montant (FCFA) <span class="text-danger">*</span></label><input type="number" class="form-control" value="15000"></div>
+            <div class="col-sm-6"><label class="form-label fw-semibold">Mode de paiement</label><select class="form-select"><option>Espèces</option><option>Virement</option><option>Chèque</option><option>Orange Money</option><option>Wave</option></select></div>
+          </div>
+          <div class="mb-3"><label class="form-label fw-semibold">Date</label><input type="date" class="form-control" value="2026-04-11"></div>
+          <div class="mb-3"><label class="form-label fw-semibold">Statut</label><select class="form-select"><option>Payé</option><option>Partiel</option><option>En attente</option></select></div>
+          <div class="mb-3"><label class="form-label fw-semibold">Notes</label><textarea class="form-control" rows="2"></textarea></div>
+        </div>
+        <div class="card-footer bg-white d-flex gap-2 justify-content-end">
+          <button class="btn btn-secondary" onclick="show('paiements')">Annuler</button>
+          <button class="btn btn-primary" onclick="show('paiements')"><i class="bi bi-check-lg me-1"></i>Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PDF PREVIEW ==================== -->
+<div id="pdf" class="screen">
+  <div class="bc"><span onclick="show('prescriptions')" style="cursor:pointer" class="text-primary">Prescriptions</span> / Aperçu PDF</div>
+  <div class="pt"><i class="bi bi-file-earmark-pdf text-danger"></i>Ordonnance PDF — Aperçu</div>
+  <div class="pdfp">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <div style="font-size:1rem;font-weight:700;color:#0d6efd">Dr Hassan Diallo</div>
+        <div style="font-size:.8rem;color:#6c757d">Ophtalmologiste</div>
+        <div style="font-size:.78rem;color:#6c757d">RPPS : 10003456789</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:.9rem;font-weight:700">Cabinet d'Ophtalmologie</div>
+        <div style="font-size:.77rem;color:#6c757d">Dakar, Senegal</div>
+        <div style="font-size:.77rem;color:#6c757d">Tel : +221 77 567 89 01</div>
+        <div style="font-size:.77rem;color:#6c757d">h.diallo@ophtalmo-sn.com</div>
+      </div>
+    </div>
+    <div class="phr"></div>
+    <div style="font-size:.67rem;font-weight:700;color:#6c757d;letter-spacing:.06em;text-transform:uppercase;margin:.5rem 0 .3rem">Patient</div>
+    <table style="width:100%;border-collapse:collapse;font-size:.78rem">
+      <tr><td style="font-weight:700;color:#6c757d;padding:3px 6px;border:1px solid #dee2e6">Nom et prénom</td><td style="padding:3px 6px;border:1px solid #dee2e6">Aminata Sow</td><td style="font-weight:700;color:#6c757d;padding:3px 6px;border:1px solid #dee2e6">Date de naissance</td><td style="padding:3px 6px;border:1px solid #dee2e6">15/03/1988</td></tr>
+      <tr style="background:#f8f9fa"><td style="font-weight:700;color:#6c757d;padding:3px 6px;border:1px solid #dee2e6">Âge</td><td style="padding:3px 6px;border:1px solid #dee2e6">38 ans</td><td style="font-weight:700;color:#6c757d;padding:3px 6px;border:1px solid #dee2e6">Téléphone</td><td style="padding:3px 6px;border:1px solid #dee2e6">+221 77 123 45 67</td></tr>
+    </table>
+    <div style="text-align:center;margin:1rem 0 .5rem;font-size:.95rem;font-weight:700;border-top:1px solid #dee2e6;padding-top:.7rem">ORDONNANCE LUNETTES</div>
+    <table style="width:100%;border-collapse:collapse;font-size:.78rem">
+      <tr><th style="background:#0d6efd;color:#fff;padding:5px 8px">Oeil</th><th style="background:#0d6efd;color:#fff;padding:5px 8px">Sphere</th><th style="background:#0d6efd;color:#fff;padding:5px 8px">Cylindre</th><th style="background:#0d6efd;color:#fff;padding:5px 8px">Axe</th><th style="background:#0d6efd;color:#fff;padding:5px 8px">Addition</th></tr>
+      <tr><td style="font-weight:700;padding:4px 8px;border:1px solid #dee2e6">Oeil droit (OD)</td><td style="text-align:center;padding:4px 8px;border:1px solid #dee2e6">-2.00</td><td style="text-align:center;padding:4px 8px;border:1px solid #dee2e6">-0.75</td><td style="text-align:center;padding:4px 8px;border:1px solid #dee2e6">165°</td><td style="text-align:center;padding:4px 8px;border:1px solid #dee2e6">—</td></tr>
+      <tr style="background:#f8f9fa"><td style="font-weight:700;padding:4px 8px;border:1px solid #dee2e6">Oeil gauche (OG)</td><td style="text-align:center;padding:4px 8px;border:1px solid #dee2e6">-1.75</td><td style="text-align:center;padding:4px 8px;border:1px solid #dee2e6">-0.50</td><td style="text-align:center;padding:4px 8px;border:1px solid #dee2e6">170°</td><td style="text-align:center;padding:4px 8px;border:1px solid #dee2e6">—</td></tr>
+    </table>
+    <div style="margin-top:2rem;display:flex;justify-content:flex-end;text-align:center">
+      <div>
+        <div style="font-size:.78rem">Le 08/04/2026</div>
+        <div style="font-weight:700;font-size:.82rem">Dr Hassan Diallo</div>
+        <div style="font-size:.72rem;color:#6c757d;margin-top:.4rem">Signature et cachet :</div>
+        <div style="border-bottom:1px solid #aaa;width:140px;margin-top:1.2rem"></div>
+      </div>
+    </div>
+    <hr style="border-color:#dee2e6;margin-top:.8rem">
+    <div style="font-size:.68rem;color:#6c757d;display:flex;justify-content:space-between;align-items:flex-end">
+      <div>
+        <div>+221 77 567 89 01  •  h.diallo@ophtalmo-sn.com</div>
+        <div>Ref : PRESC-000044  —  émis le 08/04/2026</div>
+        <div>RPPS : 10003456789</div>
+      </div>
+      <div style="width:46px;height:46px;background:#f0f0f0;border:1px solid #ccc;display:flex;align-items:center;justify-content:center;font-size:.55rem;color:#999;border-radius:4px;flex-shrink:0">QR</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PARAMETRES ==================== -->
+<div id="parametres" class="screen">
+  <div class="pt"><i class="bi bi-gear text-primary"></i>Paramètres</div>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white fw-semibold"><i class="bi bi-person-gear me-2"></i>Mon profil</div>
+        <div class="card-body" style="font-size:.87rem">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="av" style="width:52px;height:52px;font-size:1.2rem;background:#e8f0fe;color:#0d6efd;border-radius:50%;">H</div>
+            <div><div class="fw-bold">Dr Hassan Diallo</div><small class="text-muted">h.diallo@ophtalmo-sn.com</small></div>
+          </div>
+          <div class="row g-2">
+            <div class="col-6"><small class="text-muted d-block">Rôle</small>Médecin</div>
+            <div class="col-6"><small class="text-muted d-block">Spécialité</small>Ophtalmologiste</div>
+            <div class="col-12"><small class="text-muted d-block">RPPS</small>10003456789</div>
+            <div class="col-12"><small class="text-muted d-block">Téléphone</small>+221 77 567 89 01</div>
+          </div>
+        </div>
+        <div class="card-footer bg-white"><button class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil me-1"></i>Modifier le profil</button></div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white fw-semibold"><i class="bi bi-shield-lock me-2"></i>Sécurité</div>
+        <div class="card-body d-grid gap-2">
+          <button class="btn btn-outline-secondary btn-sm text-start"><i class="bi bi-key me-2"></i>Changer le mot de passe</button>
+        </div>
+      </div>
+      <div class="card shadow-sm">
+        <div class="card-header bg-white fw-semibold"><i class="bi bi-palette me-2"></i>Apparence</div>
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <span>Mode sombre</span>
+          <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox" id="darkToggle" onchange="toggleDark()">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function show(id, el) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  var scr = document.getElementById(id);
+  if (scr) scr.classList.add('active');
+  // update sidebar highlight
+  if (el) {
+    document.querySelectorAll('.sl').forEach(l => l.classList.remove('active'));
+    el.classList.add('active');
+  }
+}
+function toggleDark() {
+  document.body.classList.toggle('dark');
+  var isDark = document.body.classList.contains('dark');
+  document.getElementById('di').className = isDark ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
+  var tog = document.getElementById('darkToggle');
+  if (tog) tog.checked = isDark;
+}
+// init
+document.querySelector('.sl').classList.add('active');
+</script>
+</body>
+</html>
